@@ -1,7 +1,7 @@
 class EnemyStarship extends Starship{
   public EnemyStarship(int health, int shield){
     super(health, shield);
-    println("Main Starship");
+    println("Enemy Starship");
   }
   
   @Override

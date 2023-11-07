@@ -14,7 +14,7 @@
 #                                        bottom
 
 # Material defined in separate file.
-mtllib cube.mtl
+mtllib skybox.mtl
 
 g cube
 
