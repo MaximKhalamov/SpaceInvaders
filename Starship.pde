@@ -1,20 +1,11 @@
-abstract class Starship{
+abstract class Starship extends GameObject{
   private int health;
   private int shield;
-  private float x, y;
   
   public Starship(int health, int shield){
     println("Starship!");
     this.health = health;
     this.shield = shield;
-  }
-  
-  public float getPosX(){
-    return x;
-  }
-
-  public float getPosY(){
-    return y;
   }
   
   public void getDamage(int damage){
