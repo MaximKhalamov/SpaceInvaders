@@ -26,8 +26,8 @@ int ENEMY_BOSS_SHIELD = 60;
 // --------------------------------------- END CUSTOMIZABLE ---------------------------------------
 
 // --------------------------------------- BETTER DO NOT TOUCH ---------------------------------------
-float PLANET_SIZE = 50.0f;
-float STAR_SIZE = 300.0f;
+float PLANET_SIZE = 10.0f;
+float STAR_SIZE = 50.0f;
 // --------------------------------------- END BETTER DO NOT TOUCH ---------------------------------------
 
 // --------------------------------------- FILE PATHS ---------------------------------------
@@ -35,9 +35,9 @@ float STAR_SIZE = 300.0f;
 String SKYBOX_TEXTURE_PATH = "assets/background/skybox.png";
 String SKYBOX_MODEL_PATH = "assets/background/skybox.obj";
 
-String STAR_TEXTURE_PATH = "assets/starSystem/star.png";
-String PLANET_TEXTURE_PATH = "assets/starSystem/.png";
-String PLANET_MODEL_PATH = "assets/starSystem/.obj";
+String STAR_TEXTURE_PATH = "assets/starSystem/star2.jpg";
+String PLANET_TEXTURE_PATH = "assets/starSystem/earth.jpg";
+String PLANET_MODEL_PATH = "assets/starSystem/sphere.obj";
 
 String PLAYER_TEXTURE_PATH = "assets/starship/.png";
 String PLAYER_MODEL_PATH = "assets/starship/.obj";

@@ -7,40 +7,52 @@ class Background{
   
   private PShape skyBoxModel;
   private PImage skyBoxTexture;
-  private float skyBoxSize = 5000.0f;
+  private float skyBoxSize = 10000.0f;
 
   private PShape starModel;
   private PImage starTexture;
 
   public Background(List<Planet> planets){
+    this.planets = planets;
+    
     skyBoxModel = loadShape(SKYBOX_MODEL_PATH);
     skyBoxTexture = loadImage(SKYBOX_TEXTURE_PATH);
     skyBoxModel.setTexture(skyBoxTexture);
-
     skyBoxModel.scale(skyBoxSize);
-    //starModel = loadShape(SKYBOX_MODEL_PATH);
-    //starTexture = loadImage(SKYBOX_TEXTURE_PATH);
-    //starModel.setTexture(starTexture);
+    
+    starModel = loadShape(PLANET_MODEL_PATH);
+    starTexture = loadImage(STAR_TEXTURE_PATH);
+    starModel.setTexture(starTexture);
+    starModel.scale(STAR_SIZE);
     
     bgCamera = new BackgroundCamera();
   }
   
   public void drawBG(){
-    background(5);
+    //background(0);
+    noLights();
+    
     pushMatrix();
     translate(-skyBoxSize / 2, -skyBoxSize / 2, -skyBoxSize / 2);
     shape(skyBoxModel);
+    popMatrix();
     
-    //for(Planet planet: planets){
-    //  planet.drawPlanet();
-    //}
-      camera(0.1, 0, 0, 0, 0, 0, 0, 0, 1);
+    pushMatrix();
+    rotateX(-PI/2);
+    rotateY(millis() / 2000);
+    shape(starModel);
+    popMatrix();
+
+    for(Planet planet: planets){
+      planet.drawPlanet();
+    }
+    
+      camera(0, 0, 1300, 0, 0, 0, 0, 1, 0);
 
     //camera( bgCamera.getX(), bgCamera.getY(), bgCamera.getZ(),
     //        bgCamera.getCX(), bgCamera.getCY(), bgCamera.getCZ(),
     //        bgCamera.getUX(), bgCamera.getUY(), bgCamera.getUZ()
     //);  
-      popMatrix();
 
   }
 }
