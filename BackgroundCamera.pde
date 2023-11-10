@@ -28,39 +28,27 @@ public class BackgroundCamera{
     upX = aupX; upY = aupY; upZ = aupZ;
   }
   
-  public float getX(){
-    return x;
-  }
+  public float getX(){ return x; }
+  public float getY(){ return y; }
+  public float getZ(){ return z; }
   
-  public float getY(){
-    return y;
-  }
+  public float getCX(){ return centerX; }
+  public float getCY(){ return centerY; }
+  public float getCZ(){ return centerZ; }
   
-  public float getZ(){
-    return z;
-  }
+  public float getUX(){ return upX; }
+  public float getUY(){ return upY; }
+  public float getUZ(){ return upZ; }
+
+  public void setX(float a){ x = a; }
+  public void setY(float a){ y = a; }
+  public void setZ(float a){ z = a; }
   
-  public float getCX(){
-    return centerX;
-  }
+  public void setCX(float a){ centerX = a; }
+  public void setCY(float a){ centerY = a; }
+  public void setCZ(float a){ centerZ = a; }
   
-  public float getCY(){
-    return centerY;
-  }
-  
-  public float getCZ(){
-    return centerZ;
-  }
-  
-  public float getUX(){
-    return upX;
-  }
-  
-  public float getUY(){
-    return upY;
-  }
-  
-  public float getUZ(){
-    return upZ;
-  }
+  public void setUX(float a){ upX = a; }
+  public void setUY(float a){ upY = a; }
+  public void setUZ(float a){ upZ = a; }
 }

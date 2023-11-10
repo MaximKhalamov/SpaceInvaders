@@ -31,6 +31,12 @@ float HORIZONTAL_SPEED = 10.0f;
 float PLANET_SIZE = 10.0f;
 float STAR_SIZE = 50.0f;
 
+int HEIGTH = 1080;
+int WIDTH = 1920;
+
+float coeffX = 1;
+float coeffY = 1;
+
 float LBOUND = 0.0f;
 float RBOUND = 800.0f;
 
