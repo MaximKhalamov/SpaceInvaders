@@ -1,5 +1,5 @@
 import java.util.List;
-
+import java.util.Iterator;
 
 // --------------------------------------- CUSTOMIZABLE ---------------------------------------
 int NUMBER_OF_PLANETS =         4;     // Also number of levels
@@ -7,7 +7,7 @@ float MULTIPLIER_ENEMIES =      1.0f;  // Multiplier for the numbers of enemies
 float MULTIPLIER_FIRE_RATE =    1.0f;
 float MULTIPLIER_SPEED_ENEMY =  1.0f;
 float MULTIPLIER_SPEED_PLAYER = 1.0f;
-float FPS = 60.0f;
+float FPS = 40.0f;
 
 int PLAYER_HEALTH = 50;
 int PLAYER_SHIELD = 0;
@@ -23,11 +23,18 @@ int ENEMY_HEAVY_SHIELD = 30;
 
 int ENEMY_BOSS_HEALTH = 100;
 int ENEMY_BOSS_SHIELD = 60;
+
+float HORIZONTAL_SPEED = 10.0f;
 // --------------------------------------- END CUSTOMIZABLE ---------------------------------------
 
 // --------------------------------------- BETTER DO NOT TOUCH ---------------------------------------
 float PLANET_SIZE = 10.0f;
 float STAR_SIZE = 50.0f;
+
+float LBOUND = 0.0f;
+float RBOUND = 800.0f;
+
+float INERTIA = 0.95f;
 // --------------------------------------- END BETTER DO NOT TOUCH ---------------------------------------
 
 // --------------------------------------- FILE PATHS ---------------------------------------
@@ -45,12 +52,16 @@ String PLAYER_MODEL_PATH = "assets/starship/.obj";
 String ENEMY_TEXTURE_PATH = "assets/starship/.png";
 String ENEMY_MODEL_PATH = "assets/starship/.obj";
 
+String CROSSHAIR_IMG_PATH = "assets/starship/crosshair.png";
+
 // --------------------------------------- END FILE PATHS ---------------------------------------
 
 class Main{
   private ActionField actionField;
   private Background background;
   private List<Planet> planets;
+  
+  private int currentLevel;
 
   private int playerShield;
   private int playerHealth;
@@ -68,22 +79,26 @@ class Main{
       planets.add( new Planet(enemyNumber, i - 1 == NUMBER_OF_PLANETS, PLANET_SIZE ) );
     }
   
+    actionField = new ActionField();
     background = new Background(planets);
+    currentLevel = 0;
   }
   
   void drawBackground(){
     background.drawBG();
   }
-
-  void drawActionField(){
   
+  void drawActionField(){
+    this.actionField.calculateActions();
   }
+   
 }
 
 Main main;
 
 void setup(){
-  size(800, 800, P3D);
+  fullScreen(P3D);
+  //size(800, 800, P3D);
   main = new Main();
   
   Thread gameThread = new Thread(new Runnable(){
@@ -110,17 +125,9 @@ void setup(){
 
 void draw(){
   background(0);
-  if(keyPressed){
-    if(key == 'a' || key == 'A'){
-      print("a");
-    }
-    if(key == 'd' || key == 'D'){
-      print("d");
-    }
-  }
   
   main.drawBackground();
   
-  //main.drawActionField();
+  main.drawActionField();
   
 }

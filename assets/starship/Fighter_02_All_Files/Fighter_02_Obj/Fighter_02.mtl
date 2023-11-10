@@ -1,0 +1,64 @@
+# Blender MTL File: 'Fighter_02.blend'
+# Material Count: 5
+
+newmtl Body
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Body_Normal.png
+map_Kd C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Body_BaseColor.png
+map_Ns C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Body_Roughness.png
+refl C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Body_Metallic.png
+
+newmtl Front
+Ns 323.999994
+Ka 1.000000 1.000000 1.000000
+Kd 0.957640 0.968130 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl Missile
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Missile_Normal.png
+map_Kd C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Missile_BaseColor.png
+map_Ns C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Missile_Roughness.png
+refl C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Missile_Metallic.png
+
+newmtl Rear
+Ns 323.999994
+Ka 1.000000 1.000000 1.000000
+Kd 0.940406 0.882937 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl Window
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Window_Normal.png
+map_Kd C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Window_BaseColor.png
+map_Ns C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Window_Roughness.png
+refl C:\\Users\\stu72\\Desktop\\Blender Renders\\New_Spaceships\\Fighter_02\\Fighter_02_Textures\\PBR\\Fighter_02_Window_Metallic.png

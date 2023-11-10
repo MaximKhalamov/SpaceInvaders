@@ -7,7 +7,7 @@ class Background{
   
   private PShape skyBoxModel;
   private PImage skyBoxTexture;
-  private float skyBoxSize = 10000.0f;
+  private float skyBoxSize = 16000f;
 
   private PShape starModel;
   private PImage starTexture;
@@ -25,7 +25,7 @@ class Background{
     starModel.setTexture(starTexture);
     starModel.scale(STAR_SIZE);
     
-    bgCamera = new BackgroundCamera();
+    bgCamera = new BackgroundCamera(0, 0, 1300, 0, 0, 0, 0, 1, 0);
   }
   
   public void drawBG(){
@@ -39,7 +39,7 @@ class Background{
     
     pushMatrix();
     rotateX(-PI/2);
-    rotateY(millis() / 2000);
+    //rotateY(millis() / 2000);
     shape(starModel);
     popMatrix();
 
@@ -47,12 +47,16 @@ class Background{
       planet.drawPlanet();
     }
     
-      camera(0, 0, 1300, 0, 0, 0, 0, 1, 0);
+    //bgCamera.moveRel(0, 0, -3);
+    
+    camera( bgCamera.getX(), bgCamera.getY(), bgCamera.getZ(),
+            bgCamera.getCX(), bgCamera.getCY(), bgCamera.getCZ(),
+            bgCamera.getUX(), bgCamera.getUY(), bgCamera.getUZ()
+    );  
 
-    //camera( bgCamera.getX(), bgCamera.getY(), bgCamera.getZ(),
-    //        bgCamera.getCX(), bgCamera.getCY(), bgCamera.getCZ(),
-    //        bgCamera.getUX(), bgCamera.getUY(), bgCamera.getUZ()
-    //);  
-
+  }
+  
+  public void moveToPlanet(int number){
+    
   }
 }

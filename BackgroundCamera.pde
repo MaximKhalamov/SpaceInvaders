@@ -3,13 +3,29 @@ public class BackgroundCamera{
   private float centerX, centerY, centerZ;
   private float upX, upY, upZ;
   
-  public void moveCam(float x, float y, float z){}
+  public void moveAbs(float x, float y, float z){ // camera movement to (x, y, z) from old coords
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+  
+  public void moveRel(float x, float y, float z){  // camera movement to (xold + x, yold + y, zold + z) from (xold, yold, zold)
+    this.x += x;
+    this.y += y;
+    this.z += z;
+  }
   public void rotateCam(){}
   
-  public BackgroundCamera(){
-    x = 0.0f; y = 0.0f; z = 60.0f;                 // the initial position of the camera
-    centerX = 0.0f; centerY = 0.0f; centerZ = 0.0f; // looking at the star
-    upX = 1.0f; upY = 0.0f; upZ = 0.0f;             // up vector of the camera
+  //public BackgroundCamera(){
+  //  x = 0.0f; y = 0.0f; z = 60.0f;                 // the initial position of the camera
+  //  centerX = 0.0f; centerY = 0.0f; centerZ = 0.0f; // looking at the star
+  //  upX = 1.0f; upY = 0.0f; upZ = 0.0f;             // up vector of the camera
+  //}
+  
+  public BackgroundCamera(float ax, float ay, float az, float acenterX, float acenterY, float acenterZ, float aupX, float aupY, float aupZ){
+    x = ax; y = ay; z = az;
+    centerX = acenterX; centerY = acenterY; centerZ = acenterZ;
+    upX = aupX; upY = aupY; upZ = aupZ;
   }
   
   public float getX(){

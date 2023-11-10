@@ -7,4 +7,5 @@ class MainStarship extends Starship{
   @Override
   public void shot(){
   }
+  
 }
