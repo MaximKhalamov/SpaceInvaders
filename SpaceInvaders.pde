@@ -7,7 +7,7 @@ float MULTIPLIER_ENEMIES =      1.0f;  // Multiplier for the numbers of enemies
 float MULTIPLIER_FIRE_RATE =    1.0f;
 float MULTIPLIER_SPEED_ENEMY =  1.0f;
 float MULTIPLIER_SPEED_PLAYER = 1.0f;
-float FPS = 40.0f;
+float FPS = 60.0f;
 
 int PLAYER_HEALTH = 50;
 int PLAYER_SHIELD = 0;
@@ -34,13 +34,27 @@ float STAR_SIZE = 50.0f;
 int HEIGTH = 1080;
 int WIDTH = 1920;
 
+//float coeffX = 3;
+//float coeffY = 3;
+
 float coeffX = 1;
 float coeffY = 1;
 
-float LBOUND = 0.0f;
-float RBOUND = 800.0f;
+float FOV = PI / 2;
 
-float INERTIA = 0.95f;
+float AXIS_SCALE = 20.0f;
+
+PShape PLAYER_STARSHIP_MODEL;
+PShape ENEMY_STARSHIP_MODEL;
+PShape PLAYER_BULLET_MODEL;
+PShape ENEMY_BULLET_MODEL;
+
+enum State{
+  BACKGROUND,
+  ACTIONFIELD,
+  TRANSITION,
+  MENU
+}
 // --------------------------------------- END BETTER DO NOT TOUCH ---------------------------------------
 
 // --------------------------------------- FILE PATHS ---------------------------------------
@@ -52,11 +66,21 @@ String STAR_TEXTURE_PATH = "assets/starSystem/star2.jpg";
 String PLANET_TEXTURE_PATH = "assets/starSystem/earth.jpg";
 String PLANET_MODEL_PATH = "assets/starSystem/sphere.obj";
 
-String PLAYER_TEXTURE_PATH = "assets/starship/.png";
-String PLAYER_MODEL_PATH = "assets/starship/.obj";
+String PLAYER_TEXTURE_PATH = "assets/starship/Fighter2.png";
+String PLAYER_MODEL_PATH = "assets/starship/FIghter2.obj";
 
-String ENEMY_TEXTURE_PATH = "assets/starship/.png";
-String ENEMY_MODEL_PATH = "assets/starship/.obj";
+//String ENEMY_TEXTURE_PATH = "assets/starship/Fighter1_1.png";
+String ENEMY_TEXTURE_PATH = "assets/starship/Fighter1_1.png";
+//String ENEMY_MODEL_PATH = "assets/starship/Fighter1_1_3dless_com_simplified.obj";
+String ENEMY_MODEL_PATH = "assets/starship/FIghter1_1.obj";
+//String ENEMY_TEXTURE_PATH = "assets/background/skybox.png";
+//String ENEMY_MODEL_PATH = "assets/cube.obj";
+
+String ENEMY_BULLET_TEXTURE_PATH = "assets/starship/enemy_bullet_texture.png";
+String ENEMY_BULLET_MODEL_PATH = "assets/starship/sphere.obj";
+
+String PLAYER_BULLET_TEXTURE_PATH = "assets/starship/player_bullet_texture.png";
+String PLAYER_BULLET_MODEL_PATH = "assets/starship/sphere.obj";
 
 String CROSSHAIR_IMG_PATH = "assets/starship/crosshair.png";
 
@@ -67,12 +91,16 @@ class Main{
   private Background background;
   private List<Planet> planets;
   
+  private State currentState = State.MENU;
+  
   private int currentLevel;
 
   private int playerShield;
   private int playerHealth;
 
   public Main(){    
+    loadModels();
+    
     playerHealth = PLAYER_HEALTH;
     playerShield = PLAYER_SHIELD;
     
@@ -84,18 +112,44 @@ class Main{
       // The last planet always contain boss
       planets.add( new Planet(enemyNumber, i - 1 == NUMBER_OF_PLANETS, PLANET_SIZE ) );
     }
-  
-    actionField = new ActionField();
-    background = new Background(planets);
     currentLevel = 0;
+  
+    actionField = new ActionField(planets);
+    background = new Background(planets);
   }
   
-  void drawBackground(){
+  public void loadModels(){
+    ENEMY_STARSHIP_MODEL = loadShape(ENEMY_MODEL_PATH);
+    ENEMY_STARSHIP_MODEL.scale(ENEMY_MODEL_SCALE);
+    ENEMY_STARSHIP_MODEL.setTexture(loadImage(ENEMY_TEXTURE_PATH));
+    
+    PLAYER_STARSHIP_MODEL = loadShape(PLAYER_MODEL_PATH);
+    PLAYER_STARSHIP_MODEL.scale(PLAYER_MODEL_SCALE);
+    PLAYER_STARSHIP_MODEL.setTexture(loadImage(PLAYER_TEXTURE_PATH));
+    
+    PLAYER_BULLET_MODEL = loadShape(PLAYER_BULLET_MODEL_PATH);
+    PLAYER_BULLET_MODEL.scale(PLAYER_BULLET_RADIUS);
+    PLAYER_BULLET_MODEL.setTexture(loadImage(PLAYER_BULLET_TEXTURE_PATH));
+    
+    ENEMY_BULLET_MODEL = loadShape(ENEMY_BULLET_MODEL_PATH);
+    ENEMY_BULLET_MODEL.scale(ENEMY_BULLET_RADIUS);
+    ENEMY_BULLET_MODEL.setTexture(loadImage(ENEMY_BULLET_TEXTURE_PATH));
+  }
+  
+  public void drawBackground(){
     background.drawBG();
   }
   
-  void drawActionField(){
+  public void drawActionField(){
     this.actionField.calculateActions();
+  }
+  
+  public void changeState(State state){
+    this.currentState = state;
+  }
+  
+  public State getState(){
+    return currentState;
   }
    
 }
@@ -104,9 +158,9 @@ Main main;
 
 void setup(){
   fullScreen(P3D);
-  //size(800, 800, P3D);
   main = new Main();
-  
+  main.changeState(State.ACTIONFIELD);
+  noCursor();
   Thread gameThread = new Thread(new Runnable(){
     @Override
     
@@ -118,7 +172,7 @@ void setup(){
           redraw();
           }
         }catch(InterruptedException e){
-
+          e.printStackTrace();
         }
       }
   });
@@ -131,9 +185,16 @@ void setup(){
 
 void draw(){
   background(0);
-  
-  main.drawBackground();
-  
-  main.drawActionField();
-  
+  switch(main.getState()){
+    case ACTIONFIELD: 
+      main.drawActionField();
+      break;
+    case BACKGROUND:
+      main.drawBackground();    
+      break;
+    case TRANSITION:
+      break;
+    case MENU:
+      break;
+  }  
 }

@@ -2,10 +2,12 @@ abstract class Starship extends GameObject{
   private int health;
   private int shield;
   
-  private float boundX;
-  
+  private PShape modelUULDM; // Ultra ultra low detail mod
+  private PShape modelULDM;  // Ultra LDM
+  private PShape modelLDM;
+  private PShape model;
+    
   public Starship(int health, int shield){
-    println("Starship!");
     this.health = health;
     this.shield = shield;
   }
@@ -31,14 +33,34 @@ abstract class Starship extends GameObject{
     return health;
   }
   
-  public void fixBounds(){
-    if(getPosX() < LBOUND){
-      setPosX(LBOUND);
-    }
-    if(getPosX() > RBOUND){
-      setPosX(RBOUND);
-    }
+  //public void setModel(PShape model){
+  //  this.model = model;
+  //}
+
+  public void setModel(PShape model, PShape modelLDM, PShape modelULDM, PShape modelUULDM){
+    this.model = model;
+    this.modelLDM = modelLDM;
+    this.modelULDM = modelULDM;
+    this.modelUULDM = modelUULDM;
   }
   
-  abstract public void shot();
+  // cam    - is a camera vector. Where camera is
+  // camDir - direction of camera view
+  public boolean display(float camX, float camY, float camZ, float camDirX, float camDirY, float camDirZ){
+    // DON'T RENDER OBECTS OUT OF SIGHT
+    if( cos( getDotMult( getPosX() - camX, getPosY() - camY, getPosZ() - camZ, camDirX, camDirY, camDirZ) / 
+                    //( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * (WIDTH / HEIGTH)  ) ) ){
+                    ( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * ((float)WIDTH / HEIGTH)  )  ) ){
+      return false;
+    }
+    pushMatrix();
+    translate(getPosX(), getPosY(), getPosZ());
+    rotateZ(PI);
+    rotateY(PI/2);
+    shape(model);
+    popMatrix();
+    return true;
+  }
+  
+  abstract public Bullet shot();
 }

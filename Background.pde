@@ -37,22 +37,22 @@ class Background{
     shape(skyBoxModel);
     popMatrix();
     
-    //pushMatrix();
-    //rotateX(-PI/2);
-    ////rotateY(millis() / 2000);
-    //shape(starModel);
-    //popMatrix();
+    pushMatrix();
+    rotateX(-PI/2);
+    //rotateY(millis() / 2000);
+    shape(starModel);
+    popMatrix();
 
-    //for(Planet planet: planets){
-    //  planet.drawPlanet();
-    //}
+    for(Planet planet: planets){
+      planet.drawPlanet();
+    }
     
-    ////bgCamera.moveRel(0, 0, -3);
+    //bgCamera.moveRel(0, 0, -3);
     
-    ////camera( bgCamera.getX(), bgCamera.getY(), bgCamera.getZ(),
-    //        //bgCamera.getCX(), bgCamera.getCY(), bgCamera.getCZ(),
-    //        //bgCamera.getUX(), bgCamera.getUY(), bgCamera.getUZ()
-    ////);  
+    camera( bgCamera.getX(), bgCamera.getY(), bgCamera.getZ(),
+            bgCamera.getCX(), bgCamera.getCY(), bgCamera.getCZ(),
+            bgCamera.getUX(), bgCamera.getUY(), bgCamera.getUZ()
+    );  
 
   }
   

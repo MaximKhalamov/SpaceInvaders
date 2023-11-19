@@ -63,7 +63,7 @@ abstract class GameObject{
     float lx = go.x - this.x;
     float ly = go.y - this.y;
     float lz = go.z - this.z;
-    return sqrt( lx * lx + ly * ly + lz * lz ) > this.radius; 
+    return sqrt( lx * lx + ly * ly + lz * lz ) < (this.radius + go.radius); 
   }
 
   public void frameMove(){
