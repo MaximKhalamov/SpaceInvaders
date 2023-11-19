@@ -45,7 +45,12 @@ float FOV = PI / 2;
 float AXIS_SCALE = 20.0f;
 
 PShape PLAYER_STARSHIP_MODEL;
-PShape ENEMY_STARSHIP_MODEL;
+
+PShape ENEMY_STARSHIP_LOD0_MODEL;
+PShape ENEMY_STARSHIP_LOD1_MODEL;
+PShape ENEMY_STARSHIP_LOD2_MODEL;
+PShape ENEMY_STARSHIP_LOD3_MODEL;
+
 PShape PLAYER_BULLET_MODEL;
 PShape ENEMY_BULLET_MODEL;
 
@@ -69,10 +74,16 @@ String PLANET_MODEL_PATH = "assets/starSystem/sphere.obj";
 String PLAYER_TEXTURE_PATH = "assets/starship/Fighter2.png";
 String PLAYER_MODEL_PATH = "assets/starship/FIghter2.obj";
 
-//String ENEMY_TEXTURE_PATH = "assets/starship/Fighter1_1.png";
-String ENEMY_TEXTURE_PATH = "assets/starship/Fighter1_1.png";
-//String ENEMY_MODEL_PATH = "assets/starship/Fighter1_1_3dless_com_simplified.obj";
-String ENEMY_MODEL_PATH = "assets/starship/FIghter1_1.obj";
+String ENEMY_TEXTURE_LOD0_PATH = "assets/starship/Fighter1_1.png";
+String ENEMY_TEXTURE_LOD1_PATH = "assets/starship/Fighter1_1.png";
+String ENEMY_TEXTURE_LOD2_PATH = "assets/starship/Fighter1_1.png";
+String ENEMY_TEXTURE_LOD3_PATH = "assets/starship/Fighter1_1.png";
+
+String ENEMY_MODEL_LOD0_PATH = "assets/starship/FIghter1_1.obj";
+String ENEMY_MODEL_LOD1_PATH = "assets/starship/FIghter1_1.obj";
+String ENEMY_MODEL_LOD2_PATH = "assets/starship/FIghter1_1.obj";
+String ENEMY_MODEL_LOD3_PATH = "assets/starship/qfsrgec1aua5.obj";
+
 //String ENEMY_TEXTURE_PATH = "assets/background/skybox.png";
 //String ENEMY_MODEL_PATH = "assets/cube.obj";
 
@@ -119,21 +130,21 @@ class Main{
   }
   
   public void loadModels(){
-    ENEMY_STARSHIP_MODEL = loadShape(ENEMY_MODEL_PATH);
-    ENEMY_STARSHIP_MODEL.scale(ENEMY_MODEL_SCALE);
-    ENEMY_STARSHIP_MODEL.setTexture(loadImage(ENEMY_TEXTURE_PATH));
+    ENEMY_STARSHIP_LOD0_MODEL = modelBuilder(ENEMY_MODEL_LOD0_PATH, ENEMY_TEXTURE_LOD0_PATH, ENEMY_MODEL_SCALE);
+    ENEMY_STARSHIP_LOD1_MODEL = modelBuilder(ENEMY_MODEL_LOD1_PATH, ENEMY_TEXTURE_LOD1_PATH, ENEMY_MODEL_SCALE);
+    ENEMY_STARSHIP_LOD2_MODEL = modelBuilder(ENEMY_MODEL_LOD2_PATH, ENEMY_TEXTURE_LOD2_PATH, ENEMY_MODEL_SCALE);
+    ENEMY_STARSHIP_LOD3_MODEL = modelBuilder(ENEMY_MODEL_LOD3_PATH, ENEMY_TEXTURE_LOD3_PATH, ENEMY_MODEL_SCALE);
     
-    PLAYER_STARSHIP_MODEL = loadShape(PLAYER_MODEL_PATH);
-    PLAYER_STARSHIP_MODEL.scale(PLAYER_MODEL_SCALE);
-    PLAYER_STARSHIP_MODEL.setTexture(loadImage(PLAYER_TEXTURE_PATH));
-    
-    PLAYER_BULLET_MODEL = loadShape(PLAYER_BULLET_MODEL_PATH);
-    PLAYER_BULLET_MODEL.scale(PLAYER_BULLET_RADIUS);
-    PLAYER_BULLET_MODEL.setTexture(loadImage(PLAYER_BULLET_TEXTURE_PATH));
-    
-    ENEMY_BULLET_MODEL = loadShape(ENEMY_BULLET_MODEL_PATH);
-    ENEMY_BULLET_MODEL.scale(ENEMY_BULLET_RADIUS);
-    ENEMY_BULLET_MODEL.setTexture(loadImage(ENEMY_BULLET_TEXTURE_PATH));
+    PLAYER_STARSHIP_MODEL = modelBuilder(PLAYER_MODEL_PATH, PLAYER_TEXTURE_PATH, PLAYER_MODEL_SCALE);
+    PLAYER_BULLET_MODEL = modelBuilder(PLAYER_BULLET_MODEL_PATH, PLAYER_BULLET_TEXTURE_PATH, PLAYER_BULLET_RADIUS);
+    ENEMY_BULLET_MODEL = modelBuilder(ENEMY_BULLET_MODEL_PATH, ENEMY_BULLET_TEXTURE_PATH, ENEMY_BULLET_RADIUS);    
+  }
+  
+  private PShape modelBuilder(String modelPath, String texturePath, float scaleCoeff){
+    PShape model = loadShape(modelPath);
+    model.scale(scaleCoeff);
+    model.setTexture(loadImage(texturePath));
+    return model;
   }
   
   public void drawBackground(){

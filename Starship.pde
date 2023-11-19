@@ -2,10 +2,10 @@ abstract class Starship extends GameObject{
   private int health;
   private int shield;
   
-  private PShape modelUULDM; // Ultra ultra low detail mod
-  private PShape modelULDM;  // Ultra LDM
-  private PShape modelLDM;
-  private PShape model;
+  private PShape modelLOD3;
+  private PShape modelLOD2;
+  private PShape modelLOD1;
+  private PShape modelLOD0;
     
   public Starship(int health, int shield){
     this.health = health;
@@ -32,16 +32,12 @@ abstract class Starship extends GameObject{
   public int getHealth(){
     return health;
   }
-  
-  //public void setModel(PShape model){
-  //  this.model = model;
-  //}
 
-  public void setModel(PShape model, PShape modelLDM, PShape modelULDM, PShape modelUULDM){
-    this.model = model;
-    this.modelLDM = modelLDM;
-    this.modelULDM = modelULDM;
-    this.modelUULDM = modelUULDM;
+  public void setModel(PShape modelLOD0, PShape modelLOD1, PShape modelLOD2, PShape modelLOD3){
+    this.modelLOD0 = modelLOD0;
+    this.modelLOD1 = modelLOD1;
+    this.modelLOD2 = modelLOD2;
+    this.modelLOD3 = modelLOD3;
   }
   
   // cam    - is a camera vector. Where camera is
@@ -53,11 +49,24 @@ abstract class Starship extends GameObject{
                     ( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * ((float)WIDTH / HEIGTH)  )  ) ){
       return false;
     }
+    float distance = getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ);
     pushMatrix();
     translate(getPosX(), getPosY(), getPosZ());
     rotateZ(PI);
     rotateY(PI/2);
-    shape(model);
+    if( distance < 100 ){
+      shape(modelLOD0);    
+      println("LOD 0");
+    } else if ( distance >= 100 && distance < 300 ){
+      shape(modelLOD1);
+      println("LOD 1");
+    } else if ( distance >= 300 && distance < 1000 ){
+      shape(modelLOD2);
+      println("LOD 2");
+    } else {
+      shape(modelLOD3);
+      println("LOD 3");
+    }
     popMatrix();
     return true;
   }

@@ -68,13 +68,17 @@ class ActionField{
       
       //TEMPORERY CODE
       enemies = new ArrayList<>();
-      for(int i = 0; i < 10; i++){
-        for(int j = 0; j < 20; j++){
-          enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -100 * (j + 1), 100 * (i + 1), 100));    
-        }
-      }
+      //for(int z = 0; z < 5; z++){
+        //for(int i = 0; i < 10; i++){
+        //  for(int j = 0; j < 20; j++){
+        //    enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -100 * (j + 1), 100 * (i + 1), 100));    
+        //    //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -100 * (j + 1), 100 * (i + 1), 100 * (z + 1)));    
+        //  }
+        //}
+      //}
+      
 
-      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -40, 40, 400));
+      enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -40, 40, 500));
       //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -140, 40, 400));
       //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -90, 90, 400));
       //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -140, 140, 400));
@@ -97,7 +101,7 @@ class ActionField{
     Iterator<Starship> enemyIterator = enemies.iterator();
     while(enemyIterator.hasNext()){
       if(!bullets.isEmpty()){
-        println("Check");
+        //println("Check");
         Starship enemy = enemyIterator.next();
         Iterator<Bullet> bulletIterator = bullets.iterator();
           while(bulletIterator.hasNext()){
@@ -132,6 +136,10 @@ class ActionField{
           }    
         }
       }
+    }
+    
+    for(Bullet bullet : bullets){
+      bullet.frameMove();
     }
     
 
@@ -171,10 +179,9 @@ class ActionField{
     }
     
     timing--;
-    if(mousePressed && (mouseButton == LEFT)){
+    if(keyPressed && (keyCode == ENTER)){
       if( timing < 0 ){
           bullets.add(mainStarship.shot());
-          println("SHOT!");
         timing = 20;    
       }
     }

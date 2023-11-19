@@ -3,12 +3,13 @@ class Bullet extends GameObject{
   private int lifeTime; // current living time
   private int maxLifeTime; // after this time the bullet disappears
   
-  public Bullet(float x, float y, float z, float vx, float vy, float vz, float r, int maxLifeTime){
+  public Bullet(float x, float y, float z, float vx, float vy, float vz, float r, int maxLifeTime, int damage){
     super();
     this.setCollisionR(r);
     setPosX(x); setPosY(y); setPosZ(z);
     setVelX(vx); setVelY(vy); setVelZ(vz);
     this.maxLifeTime = maxLifeTime;
+    this.damage = damage;
   }
   
   @Override
