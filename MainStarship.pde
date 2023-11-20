@@ -6,7 +6,7 @@ float PLAYER_BULLET_SPEED_Y = 0;
 float PLAYER_BULLET_SPEED_Z = 20.0f;
 float PLAYER_BULLET_RADIUS = 5.0f;
 int PLAYER_BULLET_LIFE_TIME = 300;
-int PLAYER_DAMAGE = 10;
+int PLAYER_DAMAGE = 20;
 
 class MainStarship extends Starship{
   //private int recharge = 50;

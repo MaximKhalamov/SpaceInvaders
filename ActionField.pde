@@ -68,21 +68,15 @@ class ActionField{
       
       //TEMPORERY CODE
       enemies = new ArrayList<>();
-      //for(int z = 0; z < 5; z++){
-        //for(int i = 0; i < 10; i++){
-        //  for(int j = 0; j < 20; j++){
-        //    enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -100 * (j + 1), 100 * (i + 1), 100));    
-        //    //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -100 * (j + 1), 100 * (i + 1), 100 * (z + 1)));    
-        //  }
-        //}
-      //}
-      
-
       enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -40, 40, 500));
-      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -140, 40, 400));
-      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -90, 90, 400));
-      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -140, 140, 400));
-      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -40, 140, 400));
+      enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -140, 140, 500));
+      enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -240, 240, 500));
+      enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -340, 340, 500));
+      enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -440, 440, 500));
+      
+    for(Starship ss : enemies){
+      ss.setVelZ(-1.0);
+    }
       
       isLevelStarted = false;
     }
@@ -137,9 +131,14 @@ class ActionField{
         }
       }
     }
-    
+
+    //for(Starship ss : enemies){
+    //  ss.frameMove();
+    //}
+
     for(Bullet bullet : bullets){
       bullet.frameMove();
+      bullet.display();
     }
     
 
@@ -165,7 +164,7 @@ class ActionField{
     mainStarship.setPosZ(cam.getZ() - camInitZ);
     mainStarship.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1);
 
-    displayAxis(cam.getX() - camInitX, cam.getY() - camInitY, cam.getZ() - camInitZ);
+    //displayAxis(cam.getX() - camInitX, cam.getY() - camInitY, cam.getZ() - camInitZ);
 
     if(keyPressed){
       if(keyCode == UP){
@@ -179,7 +178,7 @@ class ActionField{
     }
     
     timing--;
-    if(keyPressed && (keyCode == ENTER)){
+    if(mousePressed && (mouseButton == LEFT)){
       if( timing < 0 ){
           bullets.add(mainStarship.shot());
         timing = 20;    
@@ -187,7 +186,7 @@ class ActionField{
     }
 
     pushMatrix();
-    translate(cam.getX() - camInitX - 100, cam.getY() - camInitY - 100, cam.getZ() - camInitZ + 400); 
+    translate(cam.getX() - camInitX - 100, cam.getY() - camInitY - 100, cam.getZ() - camInitZ + 600); 
     scale(2);
     hint(DISABLE_DEPTH_TEST);
     image(crosshair, 0, 0);
