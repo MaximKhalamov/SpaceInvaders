@@ -1,3 +1,56 @@
+class StarDrawer{
+  private int starNumber = 1500;
+
+  float[] starX = new float[starNumber];
+  float[] starY = new float[starNumber];
+  float[] starZ = new float[starNumber];
+  float[] starPZ = new float[starNumber];
+
+  float speed = 40;
+
+  public StarDrawer(){
+    for (int i = 0; i < starNumber; i++) {
+      starX[i] = random(-width, width);
+      starY[i] = random(-height, height);
+      starZ[i] = random(width);
+      starPZ[i] = starZ[i];
+    }
+  }
+  
+  void update(){
+    for(int i = 0; i < starNumber; i++){
+      starZ[i] = starZ[i] - speed;
+      if(starZ[i] < 1){
+        starZ[i] = random(width);
+        starX[i] = random(-width, width);
+        starY[i] = random(-height, height);
+        starPZ[i] = starZ[i];
+      }
+    }
+  }
+  
+  void show(){
+    fill(255);
+    stroke(255);
+  
+    for(int i = 0; i < starNumber; i++){
+      float sx = map(starX[i] / starZ[i], 0, 1, 0, width);
+      float sy = map(starY[i] / starZ[i], 0, 1, 0, height);
+  
+      float r = map(starZ[i], 0, width, 4, 0);
+      //ellipse(sx, sy, r, r);
+  
+      float px = map(starX[i] / starPZ[i], 0, 1, 0, width);
+      float py = map(starY[i] / starPZ[i], 0, 1, 0, height);
+      
+      starPZ[i] = starZ[i];
+      
+      strokeWeight(r);
+      line(px, py, 0, sx, sy, 0);
+    }
+  }
+}
+
 class ActionField{
   private MainStarship mainStarship;
   private List<Starship> enemies;
@@ -13,11 +66,14 @@ class ActionField{
 
   private PShape skyBoxModel;
   private PImage skyBoxTexture;
-  private float skyBoxSize = 170000f;
-
+  private float skyBoxSize = 17000f;
+  private float playerCoords = 0;
+  
   private PImage crosshair = loadImage(CROSSHAIR_IMG_PATH);
   float camInitX = 0, camInitY = -30, camInitZ = -60;
   float easing = 0.05;
+
+  private StarDrawer sd;
 
   private BackgroundCamera cam = new BackgroundCamera(camInitX, camInitY, camInitZ,
                                                       camInitX, camInitY, camInitZ + 0.1,
@@ -58,6 +114,10 @@ class ActionField{
     popMatrix();  
   }
 
+  public void drawStarfield(){
+  
+  }
+
   public void calculateActions(){
     if(isLevelStarted){
       //place all enemy ships here
@@ -73,6 +133,8 @@ class ActionField{
       enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -240, 240, 500));
       enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -340, 340, 500));
       enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -440, 440, 500));
+      
+      sd = new StarDrawer();
       
     for(Starship ss : enemies){
       ss.setVelZ(-1.0);
@@ -141,7 +203,6 @@ class ActionField{
       bullet.display();
     }
     
-
     noLights();
 
     int count = 0;
@@ -157,6 +218,9 @@ class ActionField{
       shape(skyBoxModel);
     popMatrix();
 
+    float tx = cam.getX();
+    float ty = cam.getY();
+
     cam.setX(lerp(cam.getX(), -coeffX*mouseX, easing));
     cam.setY(lerp(cam.getY(), coeffY*mouseY, easing));
     mainStarship.setPosX(cam.getX() - camInitX);
@@ -165,17 +229,6 @@ class ActionField{
     mainStarship.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1);
 
     //displayAxis(cam.getX() - camInitX, cam.getY() - camInitY, cam.getZ() - camInitZ);
-
-    if(keyPressed){
-      if(keyCode == UP){
-        //print("-----");
-        //print(" x: " + (cam.getX() - camInitX));
-        //print(" y: " + (cam.getY() - camInitY));
-        //print(" z: " + (cam.getZ() - camInitZ));
-        //println(" -----");
-        println(count);
-      }
-    }
     
     timing--;
     if(mousePressed && (mouseButton == LEFT)){
@@ -184,6 +237,13 @@ class ActionField{
         timing = 20;    
       }
     }
+
+    pushMatrix();
+    //translate(cam.getX(), cam.getY(), -cam.getZ());
+    translate(tx, ty, -cam.getZ());
+    sd.update();
+    sd.show();
+    popMatrix();
 
     pushMatrix();
     translate(cam.getX() - camInitX - 100, cam.getY() - camInitY - 100, cam.getZ() - camInitZ + 600); 

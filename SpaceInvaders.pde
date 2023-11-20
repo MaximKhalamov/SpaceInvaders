@@ -77,12 +77,13 @@ String PLAYER_MODEL_PATH = "assets/starship/FIghter2.obj";
 String ENEMY_TEXTURE_LOD0_PATH = "assets/starship/Fighter1_1.png";
 String ENEMY_TEXTURE_LOD1_PATH = "assets/starship/Fighter1_1.png";
 String ENEMY_TEXTURE_LOD2_PATH = "assets/starship/Fighter1_1.png";
-String ENEMY_TEXTURE_LOD3_PATH = "assets/starship/Fighter1_1.png";
+String ENEMY_TEXTURE_LOD3_PATH = "assets/starship/new/TEXT01.png";
 
-String ENEMY_MODEL_LOD0_PATH = "assets/starship/FIghter1_1.obj";
+//String ENEMY_MODEL_LOD0_PATH = "assets/starship/FIghter1_1.obj";
+String ENEMY_MODEL_LOD3_PATH = "assets/starship/new/01_1.obj";
 String ENEMY_MODEL_LOD1_PATH = "assets/starship/FIghter1_1.obj";
 String ENEMY_MODEL_LOD2_PATH = "assets/starship/FIghter1_1.obj";
-String ENEMY_MODEL_LOD3_PATH = "assets/starship/qfsrgec1aua5.obj";
+String ENEMY_MODEL_LOD0_PATH = "assets/starship/qfsrgec1aua5.obj";
 
 //String ENEMY_TEXTURE_PATH = "assets/background/skybox.png";
 //String ENEMY_MODEL_PATH = "assets/cube.obj";
