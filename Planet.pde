@@ -35,6 +35,14 @@ class Planet{
     model.scale(planetSize);
 }
   
+  public float getX(){
+    return x;
+  }
+
+  public float getY(){
+    return y;
+  }
+  
   public void drawPlanet(){
     //    float randomAngle = random(-PI, PI);
     //x = r * cos(randomAngle);

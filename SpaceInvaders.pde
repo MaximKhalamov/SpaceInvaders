@@ -171,8 +171,9 @@ Main main;
 void setup(){
   fullScreen(P3D);
   main = new Main();
-  main.changeState(State.ACTIONFIELD);
+  main.changeState(State.BACKGROUND);
   noCursor();
+  perspective(FOV, float(width)/float(height), 1, 200000);
   Thread gameThread = new Thread(new Runnable(){
     @Override
     
