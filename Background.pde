@@ -48,8 +48,8 @@ class Background{
     float distX = (1 - l) * xFrom + l * xTo;
     float distY = (1 - l) * yFrom + l * yTo;
     
-    float hx = - (yFrom - yTo) * 2;
-    float hy =   (xFrom - xTo) * 2;
+    float hx = - (yFrom - yTo) * 0.75;
+    float hy =   (xFrom - xTo) * 0.75;
     
     middlePointBezierX = hx + distX;
     middlePointBezierY = hy + distY;

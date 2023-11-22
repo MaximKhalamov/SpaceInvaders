@@ -6,7 +6,7 @@ class StarDrawer{
   float[] starZ = new float[starNumber];
   float[] starPZ = new float[starNumber];
 
-  float speed = 40;
+  float speed = 400;
 
   public StarDrawer(){
     for (int i = 0; i < starNumber; i++) {
@@ -25,6 +25,7 @@ class StarDrawer{
         starX[i] = random(-width, width);
         starY[i] = random(-height, height);
         starPZ[i] = starZ[i];
+         
       }
     }
   }
@@ -70,8 +71,13 @@ class ActionField{
   private float playerCoords = 0;
   
   private PImage crosshair = loadImage(CROSSHAIR_IMG_PATH);
-  float camInitX = 0, camInitY = -30, camInitZ = -60;
-  float easing = 0.05;
+  private PImage victoryScreen = loadImage(VICTORY_SCREEN);
+  private PImage gameoverScreen = loadImage(GAMEOVER_SCREEN);
+  private PImage redScreen = loadImage(RED_SCREEN);
+  private int redScreenTiming = 0;
+
+  private float camInitX = 0, camInitY = -30, camInitZ = -60;
+  private float easing = 0.05;
 
   private StarDrawer sd;
 
@@ -89,11 +95,19 @@ class ActionField{
     mainStarship = new MainStarship(PLAYER_HEALTH, PLAYER_SHIELD);
   }
 
-  public void gameOver(){
-    println("Game over!");
-    println("Try again");
+  private void displayScreen(PImage texture){
+    pushMatrix();
+    float scaleCoeff = 0.002;
+    translate(cam.getX() + WIDTH / 2 * scaleCoeff, cam.getY() - HEIGTH / 2 * scaleCoeff, cam.getZ()+1);
+    rotateY(PI);
+    scale(scaleCoeff);
+    hint(DISABLE_DEPTH_TEST);
+    image(texture, 0, 0);
+    hint(ENABLE_DEPTH_TEST);
+    popMatrix();
   }
 
+  
   private void displayAxis(float x, float y, float z){
     pushMatrix();
 
@@ -128,11 +142,17 @@ class ActionField{
       
       //TEMPORERY CODE
       enemies = new ArrayList<>();
-      enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -40, 40, 500));
-      enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -140, 140, 500));
-      enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -240, 240, 500));
-      enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -340, 340, 500));
-      enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -440, 440, 500));
+      
+      for(int i = 0; i < 7; i++){
+        for(int j = 0; j < 7; j++){
+          enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -80 - i * 150, 80 + j * 150, 800));        
+        }
+      }
+      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -40, 40, 500));
+      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -140, 140, 500));
+      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -240, 240, 500));
+      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -340, 340, 500));
+      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -440, 440, 500));
       
       sd = new StarDrawer();
       
@@ -141,16 +161,6 @@ class ActionField{
     }
       
       isLevelStarted = false;
-    }
-
-    if(enemies.isEmpty()){
-      // VICTORY!
-      println("VICTORY");
-    }
-
-    if(isLevelFailed){
-      // FAIL!
-      println("FAIL");
     }
 
     ////Enemy collision check
@@ -186,9 +196,10 @@ class ActionField{
       while(bulletIterator.hasNext()){
         Bullet bullet = bulletIterator.next();
         if(bullet.checkCollision(mainStarship)){
+          redScreenTiming = 4;
           bulletIterator.remove();
           if(mainStarship.setDamage( bullet.getDamage() )){
-            this.gameOver();
+            isLevelFailed = true;
           }    
         }
       }
@@ -205,11 +216,11 @@ class ActionField{
     
     noLights();
 
-    int count = 0;
-    //if(random(0, 100) < 2)
     for(Starship ss: enemies){
       if(ss.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1)){
-        count++;
+        if(random(0, 100) < 1){
+          bullets.add(ss.shot());
+        }
       }            
     }
 
@@ -230,11 +241,13 @@ class ActionField{
 
     //displayAxis(cam.getX() - camInitX, cam.getY() - camInitY, cam.getZ() - camInitZ);
     
+
+    
     timing--;
-    if(mousePressed && (mouseButton == LEFT)){
+    if(mousePressed && (mouseButton == LEFT) && !isLevelFailed){
       if( timing < 0 ){
           bullets.add(mainStarship.shot());
-        timing = 20;    
+        timing = 10;    
       }
     }
 
@@ -253,7 +266,22 @@ class ActionField{
     hint(ENABLE_DEPTH_TEST);
     popMatrix();
 
-    perspective(FOV, float(width)/float(height), 1, 200000);
     camera(cam.getX(), cam.getY(), cam.getZ(), cam.getX(), cam.getY(), cam.getZ() + 0.1, 0, 1, 0);
+
+    if(redScreenTiming > 0){
+      redScreenTiming--;
+      displayScreen(redScreen);
+    }
+
+    if(enemies.isEmpty()){
+      displayScreen(victoryScreen);
+      return;
+    }
+
+    if(isLevelFailed){
+      displayScreen(gameoverScreen);
+      return;
+    }   
+ 
   }
 }

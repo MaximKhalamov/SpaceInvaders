@@ -2,16 +2,16 @@ class Bullet extends GameObject{
   private int damage;
   private int lifeTime; // current living time
   private int maxLifeTime; // after this time the bullet disappears
-  private PShape model;
+  private color bulletColor;
   
-  public Bullet(float x, float y, float z, float vx, float vy, float vz, float r, int maxLifeTime, int damage){
+  public Bullet(float x, float y, float z, float vx, float vy, float vz, float r, int maxLifeTime, int damage, color bulletColor){
     super();
     this.setCollisionR(r);
     setPosX(x); setPosY(y); setPosZ(z);
     setVelX(vx); setVelY(vy); setVelZ(vz);
     this.maxLifeTime = maxLifeTime;
     this.damage = damage;
-    this.model = PLAYER_BULLET_MODEL;
+    this.bulletColor = bulletColor;
   }
   
   @Override
@@ -33,8 +33,15 @@ class Bullet extends GameObject{
   
   public void display(){
     pushMatrix();
+    noStroke();
     translate(getPosX(), getPosY(), getPosZ());
-    shape(model);
+    fill(bulletColor);
+    box(4, 4, 60);
+    hint(DISABLE_DEPTH_TEST);
+    fill(255);
+    box(3, 3, 45);
+    hint(ENABLE_DEPTH_TEST);
+    
     popMatrix();
   }
 }

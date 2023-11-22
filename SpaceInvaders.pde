@@ -51,8 +51,8 @@ PShape ENEMY_STARSHIP_LOD1_MODEL;
 PShape ENEMY_STARSHIP_LOD2_MODEL;
 PShape ENEMY_STARSHIP_LOD3_MODEL;
 
-PShape PLAYER_BULLET_MODEL;
-PShape ENEMY_BULLET_MODEL;
+color PLAYER_BULLET_COLOR = color(255, 210, 0);
+color ENEMY_BULLET_COLOR = color(255, 0 , 0);
 
 enum State{
   BACKGROUND,
@@ -67,10 +67,11 @@ enum State{
 String SKYBOX_TEXTURE_PATH = "assets/background/skybox.png";
 String SKYBOX_MODEL_PATH = "assets/background/skybox.obj";
 
-String STAR_TEXTURE_PATH = "assets/starSystem/star2.jpg";
+String STAR_TEXTURE_PATH = "assets/starSystem/starWhite.jpg";
 String PLANET_TEXTURE_PATH = "assets/starSystem/earth.jpg";
 String PLANET_MODEL_PATH = "assets/starSystem/sphere.obj";
 
+//String PLAYER_TEXTURE_PATH = "assets/starship/FighterFemboy.png";
 String PLAYER_TEXTURE_PATH = "assets/starship/Fighter2.png";
 String PLAYER_MODEL_PATH = "assets/starship/FIghter2.obj";
 
@@ -80,13 +81,14 @@ String ENEMY_TEXTURE_LOD2_PATH = "assets/starship/Fighter1_1.png";
 String ENEMY_TEXTURE_LOD3_PATH = "assets/starship/new/TEXT01.png";
 
 //String ENEMY_MODEL_LOD0_PATH = "assets/starship/FIghter1_1.obj";
-String ENEMY_MODEL_LOD3_PATH = "assets/starship/new/01_1.obj";
+String ENEMY_MODEL_LOD3_PATH = "assets/starship/qfsrgec1aua5.obj";
 String ENEMY_MODEL_LOD1_PATH = "assets/starship/FIghter1_1.obj";
-String ENEMY_MODEL_LOD2_PATH = "assets/starship/FIghter1_1.obj";
-String ENEMY_MODEL_LOD0_PATH = "assets/starship/qfsrgec1aua5.obj";
+String ENEMY_MODEL_LOD2_PATH = "assets/starship/qfsrgec1aua5.obj";
+String ENEMY_MODEL_LOD0_PATH = "assets/starship/FIghter1_1.obj";
 
-//String ENEMY_TEXTURE_PATH = "assets/background/skybox.png";
-//String ENEMY_MODEL_PATH = "assets/cube.obj";
+String VICTORY_SCREEN = "assets/victoryScreen.png";
+String GAMEOVER_SCREEN = "assets/gameoverScreen.png";
+String RED_SCREEN = "assets/redScreen.png";
 
 String ENEMY_BULLET_TEXTURE_PATH = "assets/starship/enemy_bullet_texture.png";
 String ENEMY_BULLET_MODEL_PATH = "assets/starship/sphere.obj";
@@ -136,9 +138,7 @@ class Main{
     ENEMY_STARSHIP_LOD2_MODEL = modelBuilder(ENEMY_MODEL_LOD2_PATH, ENEMY_TEXTURE_LOD2_PATH, ENEMY_MODEL_SCALE);
     ENEMY_STARSHIP_LOD3_MODEL = modelBuilder(ENEMY_MODEL_LOD3_PATH, ENEMY_TEXTURE_LOD3_PATH, ENEMY_MODEL_SCALE);
     
-    PLAYER_STARSHIP_MODEL = modelBuilder(PLAYER_MODEL_PATH, PLAYER_TEXTURE_PATH, PLAYER_MODEL_SCALE);
-    PLAYER_BULLET_MODEL = modelBuilder(PLAYER_BULLET_MODEL_PATH, PLAYER_BULLET_TEXTURE_PATH, PLAYER_BULLET_RADIUS);
-    ENEMY_BULLET_MODEL = modelBuilder(ENEMY_BULLET_MODEL_PATH, ENEMY_BULLET_TEXTURE_PATH, ENEMY_BULLET_RADIUS);    
+    PLAYER_STARSHIP_MODEL = modelBuilder(PLAYER_MODEL_PATH, PLAYER_TEXTURE_PATH, PLAYER_MODEL_SCALE); 
   }
   
   private PShape modelBuilder(String modelPath, String texturePath, float scaleCoeff){
@@ -171,7 +171,7 @@ Main main;
 void setup(){
   fullScreen(P3D);
   main = new Main();
-  main.changeState(State.BACKGROUND);
+  main.changeState(State.ACTIONFIELD);
   noCursor();
   perspective(FOV, float(width)/float(height), 1, 200000);
   Thread gameThread = new Thread(new Runnable(){

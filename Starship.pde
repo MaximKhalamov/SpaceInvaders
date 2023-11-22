@@ -46,6 +46,7 @@ abstract class Starship extends GameObject{
     // DON'T RENDER OBECTS OUT OF SIGHT
     if( cos( getDotMult( getPosX() - camX, getPosY() - camY, getPosZ() - camZ, camDirX, camDirY, camDirZ) / 
                     //( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * (WIDTH / HEIGTH)  ) ) ){
+                    //( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 3 * ( (float)WIDTH / HEIGTH)  )  ) ){
                     ( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * ((float)WIDTH / HEIGTH)  )  ) ){
       return false;
     }
@@ -56,16 +57,12 @@ abstract class Starship extends GameObject{
     rotateY(PI/2);
     if( distance < 100 ){
       shape(modelLOD0);    
-      println("LOD 0");
     } else if ( distance >= 100 && distance < 300 ){
       shape(modelLOD1);
-      println("LOD 1");
     } else if ( distance >= 300 && distance < 1000 ){
       shape(modelLOD2);
-      println("LOD 2");
     } else {
       shape(modelLOD3);
-      println("LOD 3");
     }
     popMatrix();
     return true;

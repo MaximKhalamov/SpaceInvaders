@@ -10,7 +10,7 @@ Plan:
 (DONE)                      6) Add basic battle machanics
                             7) Add bot AI
                             8) Repair skybox
-                            9) Add bullet model and texture
+(DONE)                      9) Add bullet model and texture
 (DONE USING BEZIERS CURVE) 10) Add movement from one planet to another
                             11) Add advanced battle mechanics
                             12) Add sound(optional)
