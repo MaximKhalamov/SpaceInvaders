@@ -7,7 +7,7 @@ float MULTIPLIER_ENEMIES =      1.0f;  // Multiplier for the numbers of enemies
 float MULTIPLIER_FIRE_RATE =    1.0f;
 float MULTIPLIER_SPEED_ENEMY =  1.0f;
 float MULTIPLIER_SPEED_PLAYER = 1.0f;
-float FPS = 40.0f;
+float FPS = 60.0f;
 
 int PLAYER_HEALTH = 50;
 int PLAYER_SHIELD = 0;
@@ -34,13 +34,32 @@ float STAR_SIZE = 50.0f;
 int HEIGTH = 1080;
 int WIDTH = 1920;
 
+//float coeffX = 3;
+//float coeffY = 3;
+
 float coeffX = 1;
 float coeffY = 1;
 
-float LBOUND = 0.0f;
-float RBOUND = 800.0f;
+float FOV = PI / 2;
 
-float INERTIA = 0.95f;
+float AXIS_SCALE = 20.0f;
+
+PShape PLAYER_STARSHIP_MODEL;
+
+PShape ENEMY_STARSHIP_LOD0_MODEL;
+PShape ENEMY_STARSHIP_LOD1_MODEL;
+PShape ENEMY_STARSHIP_LOD2_MODEL;
+PShape ENEMY_STARSHIP_LOD3_MODEL;
+
+color PLAYER_BULLET_COLOR = color(255, 210, 0);
+color ENEMY_BULLET_COLOR = color(255, 0 , 0);
+
+enum State{
+  BACKGROUND,
+  ACTIONFIELD,
+  TRANSITION,
+  MENU
+}
 // --------------------------------------- END BETTER DO NOT TOUCH ---------------------------------------
 
 // --------------------------------------- FILE PATHS ---------------------------------------
@@ -48,15 +67,34 @@ float INERTIA = 0.95f;
 String SKYBOX_TEXTURE_PATH = "assets/background/skybox.png";
 String SKYBOX_MODEL_PATH = "assets/background/skybox.obj";
 
-String STAR_TEXTURE_PATH = "assets/starSystem/star2.jpg";
+String STAR_TEXTURE_PATH = "assets/starSystem/starWhite.jpg";
 String PLANET_TEXTURE_PATH = "assets/starSystem/earth.jpg";
 String PLANET_MODEL_PATH = "assets/starSystem/sphere.obj";
 
-String PLAYER_TEXTURE_PATH = "assets/starship/.png";
-String PLAYER_MODEL_PATH = "assets/starship/.obj";
+//String PLAYER_TEXTURE_PATH = "assets/starship/FighterFemboy.png";
+String PLAYER_TEXTURE_PATH = "assets/starship/Fighter2.png";
+String PLAYER_MODEL_PATH = "assets/starship/FIghter2.obj";
 
-String ENEMY_TEXTURE_PATH = "assets/starship/.png";
-String ENEMY_MODEL_PATH = "assets/starship/.obj";
+String ENEMY_TEXTURE_LOD0_PATH = "assets/starship/Fighter1_1.png";
+String ENEMY_TEXTURE_LOD1_PATH = "assets/starship/Fighter1_1.png";
+String ENEMY_TEXTURE_LOD2_PATH = "assets/starship/Fighter1_1.png";
+String ENEMY_TEXTURE_LOD3_PATH = "assets/starship/new/TEXT01.png";
+
+//String ENEMY_MODEL_LOD0_PATH = "assets/starship/FIghter1_1.obj";
+String ENEMY_MODEL_LOD3_PATH = "assets/starship/qfsrgec1aua5.obj";
+String ENEMY_MODEL_LOD1_PATH = "assets/starship/FIghter1_1.obj";
+String ENEMY_MODEL_LOD2_PATH = "assets/starship/qfsrgec1aua5.obj";
+String ENEMY_MODEL_LOD0_PATH = "assets/starship/FIghter1_1.obj";
+
+String VICTORY_SCREEN = "assets/victoryScreen.png";
+String GAMEOVER_SCREEN = "assets/gameoverScreen.png";
+String RED_SCREEN = "assets/redScreen.png";
+
+String ENEMY_BULLET_TEXTURE_PATH = "assets/starship/enemy_bullet_texture.png";
+String ENEMY_BULLET_MODEL_PATH = "assets/starship/sphere.obj";
+
+String PLAYER_BULLET_TEXTURE_PATH = "assets/starship/player_bullet_texture.png";
+String PLAYER_BULLET_MODEL_PATH = "assets/starship/sphere.obj";
 
 String CROSSHAIR_IMG_PATH = "assets/starship/crosshair.png";
 
@@ -67,12 +105,16 @@ class Main{
   private Background background;
   private List<Planet> planets;
   
+  private State currentState = State.MENU;
+  
   private int currentLevel;
 
   private int playerShield;
   private int playerHealth;
 
   public Main(){    
+    loadModels();
+    
     playerHealth = PLAYER_HEALTH;
     playerShield = PLAYER_SHIELD;
     
@@ -84,18 +126,42 @@ class Main{
       // The last planet always contain boss
       planets.add( new Planet(enemyNumber, i - 1 == NUMBER_OF_PLANETS, PLANET_SIZE ) );
     }
-  
-    actionField = new ActionField();
-    background = new Background(planets);
     currentLevel = 0;
+  
+    actionField = new ActionField(planets);
+    background = new Background(planets);
   }
   
-  void drawBackground(){
+  public void loadModels(){
+    ENEMY_STARSHIP_LOD0_MODEL = modelBuilder(ENEMY_MODEL_LOD0_PATH, ENEMY_TEXTURE_LOD0_PATH, ENEMY_MODEL_SCALE);
+    ENEMY_STARSHIP_LOD1_MODEL = modelBuilder(ENEMY_MODEL_LOD1_PATH, ENEMY_TEXTURE_LOD1_PATH, ENEMY_MODEL_SCALE);
+    ENEMY_STARSHIP_LOD2_MODEL = modelBuilder(ENEMY_MODEL_LOD2_PATH, ENEMY_TEXTURE_LOD2_PATH, ENEMY_MODEL_SCALE);
+    ENEMY_STARSHIP_LOD3_MODEL = modelBuilder(ENEMY_MODEL_LOD3_PATH, ENEMY_TEXTURE_LOD3_PATH, ENEMY_MODEL_SCALE);
+    
+    PLAYER_STARSHIP_MODEL = modelBuilder(PLAYER_MODEL_PATH, PLAYER_TEXTURE_PATH, PLAYER_MODEL_SCALE); 
+  }
+  
+  private PShape modelBuilder(String modelPath, String texturePath, float scaleCoeff){
+    PShape model = loadShape(modelPath);
+    model.scale(scaleCoeff);
+    model.setTexture(loadImage(texturePath));
+    return model;
+  }
+  
+  public void drawBackground(){
     background.drawBG();
   }
   
-  void drawActionField(){
+  public void drawActionField(){
     this.actionField.calculateActions();
+  }
+  
+  public void changeState(State state){
+    this.currentState = state;
+  }
+  
+  public State getState(){
+    return currentState;
   }
    
 }
@@ -104,9 +170,10 @@ Main main;
 
 void setup(){
   fullScreen(P3D);
-  //size(800, 800, P3D);
   main = new Main();
-  
+  main.changeState(State.ACTIONFIELD);
+  noCursor();
+  perspective(FOV, float(width)/float(height), 1, 200000);
   Thread gameThread = new Thread(new Runnable(){
     @Override
     
@@ -118,7 +185,7 @@ void setup(){
           redraw();
           }
         }catch(InterruptedException e){
-
+          e.printStackTrace();
         }
       }
   });
@@ -131,9 +198,16 @@ void setup(){
 
 void draw(){
   background(0);
-  
-  main.drawBackground();
-  
-  main.drawActionField();
-  
+  switch(main.getState()){
+    case ACTIONFIELD: 
+      main.drawActionField();
+      break;
+    case BACKGROUND:
+      main.drawBackground();    
+      break;
+    case TRANSITION:
+      break;
+    case MENU:
+      break;
+  }  
 }

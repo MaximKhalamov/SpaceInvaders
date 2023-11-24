@@ -12,6 +12,11 @@ class Background{
   private PShape starModel;
   private PImage starTexture;
 
+  private float paramT = 0;
+  
+  private float middlePointBezierX;
+  private float middlePointBezierY;
+  
   public Background(List<Planet> planets){
     this.planets = planets;
     
@@ -26,34 +31,88 @@ class Background{
     starModel.scale(STAR_SIZE);
     
     bgCamera = new BackgroundCamera(0, 0, 1300, 0, 0, 0, 0, 1, 0);
+    
+    setBezierPoints(planets.get(0), planets.get(1));
+  }
+  
+  private float hermit(float x) { return 3 * x * x - 2 * x * x * x; }
+  
+  private void setBezierPoints(Planet planetFrom, Planet planetTo){
+    float xFrom = planetFrom.getX();  
+    float yFrom = planetFrom.getY();  
+    float xTo = planetTo.getX();  
+    float yTo = planetTo.getY();
+    
+    //float l = random(0.0, 1.0);
+    float l = 0.5;
+    float distX = (1 - l) * xFrom + l * xTo;
+    float distY = (1 - l) * yFrom + l * yTo;
+    
+    float hx = - (yFrom - yTo) * 0.75;
+    float hy =   (xFrom - xTo) * 0.75;
+    
+    middlePointBezierX = hx + distX;
+    middlePointBezierY = hy + distY;
+  }
+  
+  private float getBezier2nd(float p1, float p2, float p3, float t){
+    return (1 - t) * (1 - t) * p1 
+           + 2 * t * (1 - t) * p2
+                     + t * t * p3;
+  }
+
+  private float getBezier2ndDeriv(float p1, float p2, float p3, float t){
+    return     - 2 * (1 - t) * p1
+           + 2 * (1 - 2 * t) * p2 
+                     + 2 * t * p3;
+  }
+  
+  private void move(Planet planetFrom, Planet planetTo){
+    paramT += 0.005;
+    if(paramT >=1.0){
+      return;
+    }
+    
+    float xCam = getBezier2nd(planetFrom.getX(), middlePointBezierX, planetTo.getX(), hermit(paramT));
+    float yCam = getBezier2nd(planetFrom.getY(), middlePointBezierY, planetTo.getY(), hermit(paramT));
+    
+    float xCamDeriv = getBezier2ndDeriv(planetFrom.getX(), middlePointBezierX, planetTo.getX(), hermit(paramT));
+    float yCamDeriv = getBezier2ndDeriv(planetFrom.getY(), middlePointBezierY, planetTo.getY(), hermit(paramT));
+    
+    camera( xCam, yCam, PLANET_SIZE + 1,
+            xCam + xCamDeriv, yCam + yCamDeriv, PLANET_SIZE + 1,
+             0, 0, -1);    
+    
   }
   
   public void drawBG(){
     //background(0);
     noLights();
+    //lights();
     
     pushMatrix();
     translate(-skyBoxSize / 2, -skyBoxSize / 2, -skyBoxSize / 2);
     shape(skyBoxModel);
     popMatrix();
     
-    //pushMatrix();
-    //rotateX(-PI/2);
-    ////rotateY(millis() / 2000);
-    //shape(starModel);
-    //popMatrix();
+    pushMatrix();
+    rotateX(-PI/2);
+    //rotateY(millis() / 2000);
+    shape(starModel);
+    popMatrix();
 
-    //for(Planet planet: planets){
-    //  planet.drawPlanet();
-    //}
+    for(Planet planet: planets){
+      planet.drawPlanet();
+    }
     
-    ////bgCamera.moveRel(0, 0, -3);
+    //bgCamera.moveRel(0, 0, -3);
     
-    ////camera( bgCamera.getX(), bgCamera.getY(), bgCamera.getZ(),
-    //        //bgCamera.getCX(), bgCamera.getCY(), bgCamera.getCZ(),
-    //        //bgCamera.getUX(), bgCamera.getUY(), bgCamera.getUZ()
-    ////);  
+    //camera( bgCamera.getX(), bgCamera.getY(), bgCamera.getZ(),
+    //        bgCamera.getCX(), bgCamera.getCY(), bgCamera.getCZ(),
+    //        bgCamera.getUX(), bgCamera.getUY(), bgCamera.getUZ()
+    //);  
 
+    move(planets.get(0), planets.get(1));
   }
   
   public void moveToPlanet(int number){

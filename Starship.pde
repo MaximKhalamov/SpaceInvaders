@@ -2,10 +2,12 @@ abstract class Starship extends GameObject{
   private int health;
   private int shield;
   
-  private float boundX;
-  
+  private PShape modelLOD3;
+  private PShape modelLOD2;
+  private PShape modelLOD1;
+  private PShape modelLOD0;
+    
   public Starship(int health, int shield){
-    println("Starship!");
     this.health = health;
     this.shield = shield;
   }
@@ -30,15 +32,41 @@ abstract class Starship extends GameObject{
   public int getHealth(){
     return health;
   }
-  
-  public void fixBounds(){
-    if(getPosX() < LBOUND){
-      setPosX(LBOUND);
-    }
-    if(getPosX() > RBOUND){
-      setPosX(RBOUND);
-    }
+
+  public void setModel(PShape modelLOD0, PShape modelLOD1, PShape modelLOD2, PShape modelLOD3){
+    this.modelLOD0 = modelLOD0;
+    this.modelLOD1 = modelLOD1;
+    this.modelLOD2 = modelLOD2;
+    this.modelLOD3 = modelLOD3;
   }
   
-  abstract public void shot();
+  // cam    - is a camera vector. Where camera is
+  // camDir - direction of camera view
+  public boolean display(float camX, float camY, float camZ, float camDirX, float camDirY, float camDirZ){
+    // DON'T RENDER OBECTS OUT OF SIGHT
+    if( cos( getDotMult( getPosX() - camX, getPosY() - camY, getPosZ() - camZ, camDirX, camDirY, camDirZ) / 
+                    //( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * (WIDTH / HEIGTH)  ) ) ){
+                    //( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 3 * ( (float)WIDTH / HEIGTH)  )  ) ){
+                    ( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * ((float)WIDTH / HEIGTH)  )  ) ){
+      return false;
+    }
+    float distance = getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ);
+    pushMatrix();
+    translate(getPosX(), getPosY(), getPosZ());
+    rotateZ(PI);
+    rotateY(PI/2);
+    if( distance < 100 ){
+      shape(modelLOD0);    
+    } else if ( distance >= 100 && distance < 300 ){
+      shape(modelLOD1);
+    } else if ( distance >= 300 && distance < 1000 ){
+      shape(modelLOD2);
+    } else {
+      shape(modelLOD3);
+    }
+    popMatrix();
+    return true;
+  }
+  
+  abstract public Bullet shot();
 }

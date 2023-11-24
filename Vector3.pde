@@ -1,41 +1,46 @@
+// DO NOT ALLOCATE MEMORY USING NEW TOO MUCH.
+
 public class Vector3 {
-  public double x, y, z;
+  public float x, y, z;
 
-  public Vector3(Vector2 vector2) {
-    this(vector2, 0);
-  }
-
-  public Vector3(Vector2 vector2, double z) {
-    this(vector2.x, vector2.y, z);
-  };
-
-  public Vector3(double x, double y, double z) {
+  public Vector3(float x, float y, float z) {
     this.x = x;
     this.y = y;
     this.z = z;
   }
 
-  public double length() {
-    return Math.sqrt(x * x + y * y + z * z);
+  public float length() {
+    return (float)Math.sqrt(x * x + y * y + z * z);
   }
 
-  public double normalize() {
-    return x / length();
+  public void normalize() {
+    float l = length();
+    x /= l; y /= l; z /= l;
   }
 
   public Vector3 add(Vector3 other) {
-    return new Vector3(x + other.x, y + other.y, z + other.z);
+    x += other.x; y += other.y; z += other.z;
+    return this;
   }
 
-  public Vector3 subtract(Vector3 other) {
-    return new Vector3(x - other.x, y - other.y, z - other.z);
+  public Vector3 sub(Vector3 other) {
+    x -= other.x; y -= other.y; z -= other.z;
+    return this;
   }
 
-  public Vector3 multiply(Vector3 other) {
-    return new Vector3(x * other.x, y * other.y, z * other.z);
+  public Vector3 mult(float scalar) {
+    x *= scalar; y *= scalar; z *= scalar;
+    return this;
   }
 
-  public Vector3 divide(Vector3 other) {
-    return new Vector3(x / other.x, y / other.y, z / other.z);
+  public float dot(Vector3 other) {
+    return x * other.x + y * other.y + z * other.z;
+  }
+
+  public Vector3 cross(Vector3 o) {
+    x = y * o.z - z * o.y;
+    y = z * o.x - x * o.z;
+    z = x * o.y - y * o.x;
+    return this;
   }
 }
