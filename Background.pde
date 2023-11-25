@@ -14,9 +14,6 @@ class Background{
   private float middlePointBezierX;
   private float middlePointBezierY;
   
-  private int planetFromNumber;
-  private int planetToNumber;
-  
   public Background(List<Planet> planets){
     this.planets = planets;
     
@@ -76,9 +73,6 @@ class Background{
   
   private void move(Planet planetFrom, Planet planetTo){
     paramT += 0.005;
-    if(paramT >=1.0){
-      return;
-    }
     if(IS_CINEMATOGRAPHIC_CAMERA){
       float startPosX = planetFrom.getX() + getQuarter(planetFrom.getX(), planetTo.getX());
       float startPosY = planetFrom.getY() + getQuarter(planetFrom.getY(), planetTo.getY());
@@ -124,7 +118,7 @@ class Background{
     }
   }
   
-  public void drawBG(){
+  public Signal drawBG(int planetMoveTo){
     noLights();
     //lights();
     
@@ -132,7 +126,7 @@ class Background{
     translate(-skyBoxSize / 2, -skyBoxSize / 2, -skyBoxSize / 2);
     shape(skyBoxModel);
     popMatrix();
-    
+
     pushMatrix();
     rotateX(-PI/2);
     shape(starModel);
@@ -142,6 +136,12 @@ class Background{
       planet.drawPlanet();
     }
 
-    move(planets.get(0), planets.get(1));
+    move( planets.get( planetMoveTo - 1 ), planets.get( planetMoveTo ) );
+
+    if(paramT >= 1.0f){
+      paramT = 0.0f;
+      return Signal.SWITCH;
+    }
+    return Signal.CONTINUE;
   }
 }

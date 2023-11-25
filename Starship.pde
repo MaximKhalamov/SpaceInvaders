@@ -13,10 +13,10 @@ abstract class Starship extends GameObject{
   }
   
   public boolean setDamage(int damage){
-    if(shield < damage && shield != 0){
+    if(shield < damage && shield > 0){
       shield = 0;
     } else if(shield == 0){
-      if(health < damage){
+      if(health <= damage){
         return true;
       } else{
         health -= damage;
@@ -44,10 +44,7 @@ abstract class Starship extends GameObject{
   // camDir - direction of camera view
   public boolean display(float camX, float camY, float camZ, float camDirX, float camDirY, float camDirZ){
     // DON'T RENDER OBECTS OUT OF SIGHT
-    if( cos( getDotMult( getPosX() - camX, getPosY() - camY, getPosZ() - camZ, camDirX, camDirY, camDirZ) / 
-                    //( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * (WIDTH / HEIGTH)  ) ) ){
-                    //( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 3 * ( (float)WIDTH / HEIGTH)  )  ) ){
-                    ( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * ((float)WIDTH / HEIGTH)  )  ) ){
+    if( isObjectOnScreen(getPosX(), getPosY(), getPosZ(), camX, camY, camZ, camDirX, camDirY, camDirZ) ){
       return false;
     }
     float distance = getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ);
@@ -55,11 +52,11 @@ abstract class Starship extends GameObject{
     translate(getPosX(), getPosY(), getPosZ());
     rotateZ(PI);
     rotateY(PI/2);
-    if( distance < 100 ){
+    if( distance < LOD1_DISTANCE ){
       shape(modelLOD0);    
-    } else if ( distance >= 100 && distance < 300 ){
+    } else if ( distance >= LOD1_DISTANCE && distance < LOD2_DISTANCE ){
       shape(modelLOD1);
-    } else if ( distance >= 300 && distance < 1000 ){
+    } else if ( distance >= LOD2_DISTANCE && distance < LOD3_DISTANCE ){
       shape(modelLOD2);
     } else {
       shape(modelLOD3);

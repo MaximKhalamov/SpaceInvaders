@@ -1,66 +1,10 @@
-class StarDrawer{
-  private int starNumber = 1500;
-
-  float[] starX = new float[starNumber];
-  float[] starY = new float[starNumber];
-  float[] starZ = new float[starNumber];
-  float[] starPZ = new float[starNumber];
-
-  float speed = 40;
-
-  public StarDrawer(){
-    for (int i = 0; i < starNumber; i++) {
-      starX[i] = random(-width, width);
-      starY[i] = random(-height, height);
-      starZ[i] = random(width);
-      starPZ[i] = starZ[i];
-    }
-  }
-  
-  void update(){
-    for(int i = 0; i < starNumber; i++){
-      starZ[i] = starZ[i] - speed;
-      if(starZ[i] < 1){
-        starZ[i] = random(width);
-        starX[i] = random(-width, width);
-        starY[i] = random(-height, height);
-        starPZ[i] = starZ[i];
-         
-      }
-    }
-  }
-  
-  void show(){
-    fill(255);
-    stroke(255);
-  
-    for(int i = 0; i < starNumber; i++){
-      float sx = map(starX[i] / starZ[i], 0, 1, 0, width);
-      float sy = map(starY[i] / starZ[i], 0, 1, 0, height);
-  
-      float r = map(starZ[i], 0, width, 4, 0);
-      //ellipse(sx, sy, r, r);
-  
-      float px = map(starX[i] / starPZ[i], 0, 1, 0, width);
-      float py = map(starY[i] / starPZ[i], 0, 1, 0, height);
-      
-      starPZ[i] = starZ[i];
-      
-      strokeWeight(r);
-      fill(255, 255, 255, 63);
-      line(px, py, 0, sx, sy, 0);
-      noFill();
-    }
-  }
-}
-
 enum ActionFieldState{
   INIT,
   PREPARING,
   BATTLE,
   GAMEOVER,
   CLEARED,
-  WINNING
+  VICTORY
 }
 
 class ActionField{
@@ -69,14 +13,13 @@ class ActionField{
   private List<Bullet> bullets;
   private List<Planet> planets;
 
-  private int timing = 50;
+  private int bulletTiming = 50;
+  private int prepareTiming;
+  private int clearedTiming;
 
   private ActionFieldState state = ActionFieldState.INIT;
 
-  private boolean isLevelStarted = true;
-  private boolean isLevelFailed = false;
-
-  private int currentLevel = 0;
+  private int currentLevel;
   private int enemyNumber;
 
   private PShape skyBoxModel;
@@ -103,6 +46,7 @@ class ActionField{
 
   public ActionField(List<Planet> planets){
     bullets = new ArrayList<>();
+    this.planets = planets;
     skyBoxModel = loadShape(SKYBOX_MODEL_PATH);
     skyBoxTexture = loadImage(SKYBOX_TEXTURE_PATH);
     skyBoxModel.setTexture(skyBoxTexture);
@@ -144,27 +88,87 @@ class ActionField{
     popMatrix();  
   }
 
-  public void drawStarfield(){
-  
+  private void displayAll(){
+    pushMatrix();
+    translate(-skyBoxSize / 2, -skyBoxSize / 2, -skyBoxSize / 2);
+    shape(skyBoxModel);
+    popMatrix();
+
+    float tx = cam.getX();
+    float ty = cam.getY();
+
+    cam.setX(lerp(cam.getX(), -coeffX*mouseX, easing));
+    cam.setY(lerp(cam.getY(), coeffY*mouseY, easing));
+    mainStarship.setPosX(cam.getX() - camInitX);
+    mainStarship.setPosY(cam.getY() - camInitY);
+    mainStarship.setPosZ(cam.getZ() - camInitZ);
+    mainStarship.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1, 0.015 * (tx - cam.getX()));
+
+    //displayAxis(cam.getX() - camInitX, cam.getY() - camInitY, cam.getZ() - camInitZ);
+
+    bulletTiming--;
+    if(mousePressed && (mouseButton == LEFT) && state != ActionFieldState.GAMEOVER){
+      if( bulletTiming < 0 ){
+          bullets.add(mainStarship.shot());
+        bulletTiming = (int)(10 / MULTIPLIER_FIRE_RATE_PLAYER);    
+      }
+    }
+
+    pushMatrix();
+    //translate(cam.getX(), cam.getY(), -cam.getZ());
+    translate(tx, ty, -cam.getZ());
+    sd.update();
+    sd.show();
+    popMatrix();
+
+    pushMatrix();
+    translate(cam.getX() - camInitX - 100, cam.getY() - camInitY - 100, cam.getZ() - camInitZ + 600); 
+    scale(2);
+    hint(DISABLE_DEPTH_TEST);
+    image(crosshair, 0, 0);
+    hint(ENABLE_DEPTH_TEST);
+    popMatrix();
+
+    camera(cam.getX(), cam.getY(), cam.getZ(), cam.getX(), cam.getY(), cam.getZ() + 0.1, 0, 1, 0);
   }
 
-  public void calculateActions(){
-    if(isLevelStarted){
-      enemies = new ArrayList<>();
-      enemyNumber = 6;
-      for(int i = 0; i < enemyNumber; i++){
-        enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -80 - i * 50, 80 + i * 50, 800));        
-      }
-      
-      sd = new StarDrawer();
-      
-    for(Starship ss : enemies){
-      ss.setVelZ(-1.5);
-    }
-      
-      isLevelStarted = false;
-    }
 
+  public Signal calculateActions(int level){    
+    switch(state){
+      case INIT:
+        currentLevel = level;
+        enemies = new ArrayList<>();
+        enemyNumber = planets.get(currentLevel).getEnemyNumber();
+        for(int i = 0; i < enemyNumber; i++){
+          enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -80 - i * 50, 80 + i * 50, 800));        
+        }
+        
+        sd = new StarDrawer();
+        
+        for(Starship ss : enemies){
+          ss.setVelZ(-1.5);
+        }
+        
+        state = ActionFieldState.PREPARING;
+        prepareTiming = (int)(80 * MULTIPLIER_SCREEN_TRANSISTION);
+        clearedTiming = (int)(80 * MULTIPLIER_SCREEN_TRANSISTION);
+        break;
+      case PREPARING: 
+        for(Starship ss : enemies){
+          ss.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1);      
+        }
+        displayAll();
+        displayScreen(prepareScreen);
+        prepareTiming--;
+        if(prepareTiming == 0) state = ActionFieldState.BATTLE;
+          return Signal.CONTINUE;
+      case BATTLE: break;
+      case GAMEOVER: break;
+      case CLEARED: break;
+      case VICTORY: break;
+      }
+    
+    
     ////Enemy collision check
     Iterator<Starship> enemyIterator = enemies.iterator();
     while(enemyIterator.hasNext()){
@@ -201,7 +205,7 @@ class ActionField{
           redScreenTiming = 4;
           bulletIterator.remove();
           if(mainStarship.setDamage( bullet.getDamage() )){
-            isLevelFailed = true;
+            state = ActionFieldState.GAMEOVER;
           }    
         }
       }
@@ -209,7 +213,7 @@ class ActionField{
 
     for(Bullet bullet : bullets){
       bullet.frameMove();
-      bullet.display();
+      bullet.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1);
     }
     
     noLights();
@@ -219,56 +223,15 @@ class ActionField{
         ss.frameMove();      
       }
       if(ss.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1)){
-        if(random(0, 100) < 1){
+        if(random(0, 100) < 1 * MULTIPLIER_FIRE_RATE_ENEMY){
           bullets.add(ss.shot());
         }
       }            
     }
     
-    if(!enemies.isEmpty() && enemies.get(0).getPosZ() < 0) isLevelFailed = true;
+    if(!enemies.isEmpty() && enemies.get(0).getPosZ() < 0) state = ActionFieldState.GAMEOVER;
       
-
-    pushMatrix();
-      translate(-skyBoxSize / 2, -skyBoxSize / 2, -skyBoxSize / 2);
-      shape(skyBoxModel);
-    popMatrix();
-
-    float tx = cam.getX();
-    float ty = cam.getY();
-
-    cam.setX(lerp(cam.getX(), -coeffX*mouseX, easing));
-    cam.setY(lerp(cam.getY(), coeffY*mouseY, easing));
-    mainStarship.setPosX(cam.getX() - camInitX);
-    mainStarship.setPosY(cam.getY() - camInitY);
-    mainStarship.setPosZ(cam.getZ() - camInitZ);
-    mainStarship.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1, 0.015 * (tx - cam.getX()));
-
-    //displayAxis(cam.getX() - camInitX, cam.getY() - camInitY, cam.getZ() - camInitZ);
-    
-    timing--;
-    if(mousePressed && (mouseButton == LEFT) && !isLevelFailed){
-      if( timing < 0 ){
-          bullets.add(mainStarship.shot());
-        timing = 10;    
-      }
-    }
-
-    pushMatrix();
-    //translate(cam.getX(), cam.getY(), -cam.getZ());
-    translate(tx, ty, -cam.getZ());
-    sd.update();
-    sd.show();
-    popMatrix();
-
-    pushMatrix();
-    translate(cam.getX() - camInitX - 100, cam.getY() - camInitY - 100, cam.getZ() - camInitZ + 600); 
-    scale(2);
-    hint(DISABLE_DEPTH_TEST);
-    image(crosshair, 0, 0);
-    hint(ENABLE_DEPTH_TEST);
-    popMatrix();
-
-    camera(cam.getX(), cam.getY(), cam.getZ(), cam.getX(), cam.getY(), cam.getZ() + 0.1, 0, 1, 0);
+    displayAll();
 
     if(redScreenTiming > 0){
       redScreenTiming--;
@@ -276,14 +239,26 @@ class ActionField{
     }
 
     if(enemies.isEmpty()){
-      displayScreen(clearedScreen);
-      return;
+      if(currentLevel == planets.size() - 1){
+        state = ActionFieldState.VICTORY;
+        displayScreen(victoryScreen);
+    } else {
+        state = ActionFieldState.CLEARED;
+        displayScreen(clearedScreen);
+        clearedTiming--;
+        if(clearedTiming == 0){
+          state = ActionFieldState.INIT;
+          return Signal.SWITCH;
+        }
+      }
+      return Signal.CONTINUE;
     }
 
-    if(isLevelFailed){
+    if(state == ActionFieldState.GAMEOVER){
       displayScreen(gameoverScreen);
-      return;
-    }   
- 
+      return Signal.CONTINUE;
+    }
+    
+    return Signal.CONTINUE;
   }
 }

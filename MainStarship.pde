@@ -6,7 +6,7 @@ float PLAYER_BULLET_SPEED_Y = 0;
 float PLAYER_BULLET_SPEED_Z = 30.0f;
 float PLAYER_BULLET_RADIUS = 5.0f;
 int PLAYER_BULLET_LIFE_TIME = 300;
-int PLAYER_DAMAGE = 20;
+int PLAYER_DAMAGE = 10;
 
 class MainStarship extends Starship{
   //private int recharge = 50;
@@ -26,10 +26,7 @@ class MainStarship extends Starship{
   }
   
   public boolean display(float camX, float camY, float camZ, float camDirX, float camDirY, float camDirZ, float rotation){
-   if( cos( getDotMult( getPosX() - camX, getPosY() - camY, getPosZ() - camZ, camDirX, camDirY, camDirZ) / 
-                    //( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * (WIDTH / HEIGTH)  ) ) ){
-                    //( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 3 * ( (float)WIDTH / HEIGTH)  )  ) ){
-                    ( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * ((float)WIDTH / HEIGTH)  )  ) ){
+   if( isObjectOnScreen(getPosX(), getPosY(), getPosZ(), camX, camY, camZ, camDirX, camDirY, camDirZ) ){
       return false;
     }
     float distance = getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ);
@@ -38,11 +35,11 @@ class MainStarship extends Starship{
     rotateZ(PI);
     rotateY(PI/2);
     rotateX(rotation);
-    if( distance < 100 ){
+    if( distance < LOD1_DISTANCE ){
       shape(modelLOD0);    
-    } else if ( distance >= 100 && distance < 300 ){
+    } else if ( distance >= LOD1_DISTANCE && distance < LOD2_DISTANCE ){
       shape(modelLOD1);
-    } else if ( distance >= 300 && distance < 1000 ){
+    } else if ( distance >= LOD2_DISTANCE && distance < LOD3_DISTANCE ){
       shape(modelLOD2);
     } else {
       shape(modelLOD3);

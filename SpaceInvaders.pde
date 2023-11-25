@@ -2,11 +2,12 @@ import java.util.List;
 import java.util.Iterator;
 
 // --------------------------------------- CUSTOMIZABLE ---------------------------------------
-int NUMBER_OF_PLANETS =         4;     // Also number of levels
-float MULTIPLIER_ENEMIES =      1.0f;  // Multiplier for the numbers of enemies
-float MULTIPLIER_FIRE_RATE =    1.0f;
-float MULTIPLIER_SPEED_ENEMY =  1.0f;
-float MULTIPLIER_SPEED_PLAYER = 1.0f;
+int NUMBER_OF_PLANETS =               4;     // Also number of levels
+float MULTIPLIER_ENEMIES =            1.0f;  // Multiplier for the numbers of enemies
+float MULTIPLIER_FIRE_RATE_ENEMY =    1.0f;
+float MULTIPLIER_FIRE_RATE_PLAYER =   1.0f;
+float MULTIPLIER_SPEED_ENEMY =        1.0f;
+float MULTIPLIER_SCREEN_TRANSISTION = 1.0f;
 float FPS = 60.0f;
 
 int PLAYER_HEALTH = 50;
@@ -25,7 +26,11 @@ int ENEMY_BOSS_HEALTH = 100;
 int ENEMY_BOSS_SHIELD = 60;
 
 float HORIZONTAL_SPEED = 20.0f;
-boolean IS_CINEMATOGRAPHIC_CAMERA = false;
+boolean IS_CINEMATOGRAPHIC_CAMERA = true;
+
+float LOD1_DISTANCE = 100.0f;
+float LOD2_DISTANCE = 300.0f;
+float LOD3_DISTANCE = 1000.0f;
 // --------------------------------------- END CUSTOMIZABLE ---------------------------------------
 
 // --------------------------------------- BETTER DO NOT TOUCH ---------------------------------------
@@ -52,14 +57,19 @@ PShape ENEMY_STARSHIP_LOD1_MODEL;
 PShape ENEMY_STARSHIP_LOD2_MODEL;
 PShape ENEMY_STARSHIP_LOD3_MODEL;
 
-color PLAYER_BULLET_COLOR = color(255, 210, 0);
-color ENEMY_BULLET_COLOR = color(255, 0 , 0);
+color PLAYER_BULLET_COLOR = color(0, 255, 0);
+color ENEMY_BULLET_COLOR = color(255, 0, 0);
 
 enum State{
   BACKGROUND,
   ACTIONFIELD,
   TRANSITION,
   MENU
+}
+
+enum Signal{
+  CONTINUE,
+  SWITCH,
 }
 // --------------------------------------- END BETTER DO NOT TOUCH ---------------------------------------
 
@@ -76,10 +86,12 @@ String PLANET_MODEL_PATH = "assets/starSystem/sphere.obj";
 String PLAYER_TEXTURE_PATH = "assets/starship/Fighter2.png";
 String PLAYER_MODEL_PATH = "assets/starship/FIghter2.obj";
 
+//String ENEMY_TEXTURE_LOD0_PATH = "assets/starship/Fighter1_1_verysimple.png";
+//String ENEMY_TEXTURE_LOD0_PATH = "assets/starship/Fighter1_1_simple.png";
 String ENEMY_TEXTURE_LOD0_PATH = "assets/starship/Fighter1_1.png";
 String ENEMY_TEXTURE_LOD1_PATH = "assets/starship/Fighter1_1.png";
 String ENEMY_TEXTURE_LOD2_PATH = "assets/starship/Fighter1_1.png";
-String ENEMY_TEXTURE_LOD3_PATH = "assets/starship/new/TEXT01.png";
+String ENEMY_TEXTURE_LOD3_PATH = "assets/starship/Fighter1_1.png";
 
 //String ENEMY_MODEL_LOD0_PATH = "assets/starship/FIghter1_1.obj";
 String ENEMY_MODEL_LOD3_PATH = "assets/starship/qfsrgec1aua5.obj";
@@ -117,7 +129,7 @@ class Main{
     
     planets = new ArrayList<Planet>();
     for(int i = 0; i < NUMBER_OF_PLANETS; i++){
-      int enemyNumber = (int)(MULTIPLIER_ENEMIES * (i + 1) * 10);
+      int enemyNumber = (int)(MULTIPLIER_ENEMIES * (i + 1) * 5);
       println("Enemy number: " + enemyNumber);
       
       // The last planet always contain boss
@@ -145,12 +157,12 @@ class Main{
     return model;
   }
   
-  public void drawBackground(){
-    background.drawBG();
+  public Signal drawBackground(){
+    return background.drawBG(currentLevel);
   }
   
-  public void drawActionField(){
-    this.actionField.calculateActions();
+  public Signal drawActionField(){
+    return this.actionField.calculateActions(currentLevel);
   }
   
   public void changeState(State state){
@@ -160,7 +172,10 @@ class Main{
   public State getState(){
     return currentState;
   }
-   
+  
+  public void setNextLevel(){
+    currentLevel++;
+  }
 }
 
 Main main;
@@ -197,10 +212,15 @@ void draw(){
   background(0);
   switch(main.getState()){
     case ACTIONFIELD: 
-      main.drawActionField();
+      if(main.drawActionField() == Signal.SWITCH){
+        main.changeState(State.BACKGROUND);
+        main.setNextLevel();
+      }
       break;
     case BACKGROUND:
-      main.drawBackground();    
+      if(main.drawBackground() == Signal.SWITCH){
+        main.changeState(State.ACTIONFIELD);
+      }    
       break;
     case TRANSITION:
       break;

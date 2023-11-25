@@ -18,7 +18,7 @@ class Bullet extends GameObject{
   public void frameMove(){
     super.frameMove();
     if(lifeTime >= maxLifeTime){
-      println("Delete");
+      //println("Delete");
     }
     lifeTime++;
   }
@@ -31,7 +31,10 @@ class Bullet extends GameObject{
     return lifeTime >= maxLifeTime;
   }
   
-  public void display(){
+  public void display(float camX, float camY, float camZ, float camDirX, float camDirY, float camDirZ){
+    if( isObjectOnScreen(getPosX(), getPosY(), getPosZ(), camX, camY, camZ, camDirX, camDirY, camDirZ) ){
+      return;
+    }
     pushMatrix();
     noStroke();
     translate(getPosX(), getPosY(), getPosZ());

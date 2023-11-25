@@ -43,11 +43,7 @@ class Planet{
     return y;
   }
   
-  public void drawPlanet(){
-    //    float randomAngle = random(-PI, PI);
-    //x = r * cos(randomAngle);
-    //y = r * sin(randomAngle);
-    
+  public void drawPlanet(){    
     pushMatrix();
     translate(x, y);
     shape(model);
