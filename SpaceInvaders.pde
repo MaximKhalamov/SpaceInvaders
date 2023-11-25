@@ -24,7 +24,8 @@ int ENEMY_HEAVY_SHIELD = 30;
 int ENEMY_BOSS_HEALTH = 100;
 int ENEMY_BOSS_SHIELD = 60;
 
-float HORIZONTAL_SPEED = 10.0f;
+float HORIZONTAL_SPEED = 20.0f;
+boolean IS_CINEMATOGRAPHIC_CAMERA = false;
 // --------------------------------------- END CUSTOMIZABLE ---------------------------------------
 
 // --------------------------------------- BETTER DO NOT TOUCH ---------------------------------------
@@ -88,13 +89,9 @@ String ENEMY_MODEL_LOD0_PATH = "assets/starship/FIghter1_1.obj";
 
 String VICTORY_SCREEN = "assets/victoryScreen.png";
 String GAMEOVER_SCREEN = "assets/gameoverScreen.png";
+String CLEARED_SCREEN = "assets/clearedScreen.png";
+String PREPARE_SCREEN = "assets/prepareScreen.png";
 String RED_SCREEN = "assets/redScreen.png";
-
-String ENEMY_BULLET_TEXTURE_PATH = "assets/starship/enemy_bullet_texture.png";
-String ENEMY_BULLET_MODEL_PATH = "assets/starship/sphere.obj";
-
-String PLAYER_BULLET_TEXTURE_PATH = "assets/starship/player_bullet_texture.png";
-String PLAYER_BULLET_MODEL_PATH = "assets/starship/sphere.obj";
 
 String CROSSHAIR_IMG_PATH = "assets/starship/crosshair.png";
 
@@ -105,7 +102,7 @@ class Main{
   private Background background;
   private List<Planet> planets;
   
-  private State currentState = State.MENU;
+  private State currentState = State.ACTIONFIELD;
   
   private int currentLevel;
 
@@ -171,7 +168,7 @@ Main main;
 void setup(){
   fullScreen(P3D);
   main = new Main();
-  main.changeState(State.ACTIONFIELD);
+  //main.changeState(State.BACKGROUND);
   noCursor();
   perspective(FOV, float(width)/float(height), 1, 200000);
   Thread gameThread = new Thread(new Runnable(){

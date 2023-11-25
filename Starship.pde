@@ -2,10 +2,10 @@ abstract class Starship extends GameObject{
   private int health;
   private int shield;
   
-  private PShape modelLOD3;
-  private PShape modelLOD2;
-  private PShape modelLOD1;
-  private PShape modelLOD0;
+  protected PShape modelLOD3;
+  protected PShape modelLOD2;
+  protected PShape modelLOD1;
+  protected PShape modelLOD0;
     
   public Starship(int health, int shield){
     this.health = health;

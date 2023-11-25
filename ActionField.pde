@@ -6,7 +6,7 @@ class StarDrawer{
   float[] starZ = new float[starNumber];
   float[] starPZ = new float[starNumber];
 
-  float speed = 400;
+  float speed = 40;
 
   public StarDrawer(){
     for (int i = 0; i < starNumber; i++) {
@@ -47,9 +47,20 @@ class StarDrawer{
       starPZ[i] = starZ[i];
       
       strokeWeight(r);
+      fill(255, 255, 255, 63);
       line(px, py, 0, sx, sy, 0);
+      noFill();
     }
   }
+}
+
+enum ActionFieldState{
+  INIT,
+  PREPARING,
+  BATTLE,
+  GAMEOVER,
+  CLEARED,
+  WINNING
 }
 
 class ActionField{
@@ -60,24 +71,29 @@ class ActionField{
 
   private int timing = 50;
 
+  private ActionFieldState state = ActionFieldState.INIT;
+
   private boolean isLevelStarted = true;
   private boolean isLevelFailed = false;
 
   private int currentLevel = 0;
+  private int enemyNumber;
 
   private PShape skyBoxModel;
   private PImage skyBoxTexture;
   private float skyBoxSize = 17000f;
-  private float playerCoords = 0;
   
   private PImage crosshair = loadImage(CROSSHAIR_IMG_PATH);
   private PImage victoryScreen = loadImage(VICTORY_SCREEN);
   private PImage gameoverScreen = loadImage(GAMEOVER_SCREEN);
+  private PImage clearedScreen = loadImage(CLEARED_SCREEN);
+  private PImage prepareScreen = loadImage(PREPARE_SCREEN);
   private PImage redScreen = loadImage(RED_SCREEN);
+
   private int redScreenTiming = 0;
 
-  private float camInitX = 0, camInitY = -30, camInitZ = -60;
-  private float easing = 0.05;
+  private float camInitX = 0, camInitY = -18, camInitZ = -48;
+  private float easing = 0.09;
 
   private StarDrawer sd;
 
@@ -134,30 +150,16 @@ class ActionField{
 
   public void calculateActions(){
     if(isLevelStarted){
-      //place all enemy ships here
-      //int enemyNumber = planets.get(currentLevel).getEnemyNumber();
-      
-      // HERE WE NEED TO PLACE GENERATION FUNCTION
-      //enemies = generateEnemies(enemyNumber);
-      
-      //TEMPORERY CODE
       enemies = new ArrayList<>();
-      
-      for(int i = 0; i < 7; i++){
-        for(int j = 0; j < 7; j++){
-          enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -80 - i * 150, 80 + j * 150, 800));        
-        }
+      enemyNumber = 6;
+      for(int i = 0; i < enemyNumber; i++){
+        enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -80 - i * 50, 80 + i * 50, 800));        
       }
-      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -40, 40, 500));
-      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -140, 140, 500));
-      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -240, 240, 500));
-      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -340, 340, 500));
-      //enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -440, 440, 500));
       
       sd = new StarDrawer();
       
     for(Starship ss : enemies){
-      ss.setVelZ(-1.0);
+      ss.setVelZ(-1.5);
     }
       
       isLevelStarted = false;
@@ -205,10 +207,6 @@ class ActionField{
       }
     }
 
-    //for(Starship ss : enemies){
-    //  ss.frameMove();
-    //}
-
     for(Bullet bullet : bullets){
       bullet.frameMove();
       bullet.display();
@@ -217,12 +215,18 @@ class ActionField{
     noLights();
 
     for(Starship ss: enemies){
+      if(random(0, enemyNumber) > enemies.size()){
+        ss.frameMove();      
+      }
       if(ss.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1)){
         if(random(0, 100) < 1){
           bullets.add(ss.shot());
         }
       }            
     }
+    
+    if(!enemies.isEmpty() && enemies.get(0).getPosZ() < 0) isLevelFailed = true;
+      
 
     pushMatrix();
       translate(-skyBoxSize / 2, -skyBoxSize / 2, -skyBoxSize / 2);
@@ -237,11 +241,9 @@ class ActionField{
     mainStarship.setPosX(cam.getX() - camInitX);
     mainStarship.setPosY(cam.getY() - camInitY);
     mainStarship.setPosZ(cam.getZ() - camInitZ);
-    mainStarship.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1);
+    mainStarship.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1, 0.015 * (tx - cam.getX()));
 
     //displayAxis(cam.getX() - camInitX, cam.getY() - camInitY, cam.getZ() - camInitZ);
-    
-
     
     timing--;
     if(mousePressed && (mouseButton == LEFT) && !isLevelFailed){
@@ -274,7 +276,7 @@ class ActionField{
     }
 
     if(enemies.isEmpty()){
-      displayScreen(victoryScreen);
+      displayScreen(clearedScreen);
       return;
     }
 
