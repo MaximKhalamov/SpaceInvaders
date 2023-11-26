@@ -1,4 +1,5 @@
-float currentRadius = 200.0f;
+float INIT_RADIUS = 300f;
+float currentRadius = INIT_RADIUS;
 
 class Planet{  
   private float x, y, r;
@@ -7,9 +8,11 @@ class Planet{
   private PShape model;
   private PImage texture;
   private float planetSize;
+  private float prevAngle = 0;
   
   public Planet(int enemyNumber, boolean hasBoss, float planetSize){
-    float randomAngle = random(-PI, PI);
+    float randomAngle = random(- PI / 3 + prevAngle, PI / 3 + prevAngle);
+    prevAngle = randomAngle;
     x = currentRadius * cos(randomAngle);
     y = currentRadius * sin(randomAngle);
 
@@ -42,10 +45,11 @@ class Planet{
   public float getY(){
     return y;
   }
-  
+
   public void drawPlanet(){    
     pushMatrix();
     translate(x, y);
+    rotateX(PI/2);
     shape(model);
     popMatrix();
   }

@@ -2,7 +2,7 @@ import java.util.List;
 import java.util.Iterator;
 
 // --------------------------------------- CUSTOMIZABLE ---------------------------------------
-int NUMBER_OF_PLANETS =               4;     // Also number of levels
+int NUMBER_OF_PLANETS =               8;     // Also number of levels
 float MULTIPLIER_ENEMIES =            1.0f;  // Multiplier for the numbers of enemies
 float MULTIPLIER_FIRE_RATE_ENEMY =    1.0f;
 float MULTIPLIER_FIRE_RATE_PLAYER =   1.0f;
@@ -26,6 +26,7 @@ int ENEMY_BOSS_HEALTH = 100;
 int ENEMY_BOSS_SHIELD = 60;
 
 float HORIZONTAL_SPEED = 20.0f;
+//float HORIZONTAL_SPEED = 1.0f;
 boolean IS_CINEMATOGRAPHIC_CAMERA = true;
 
 float LOD1_DISTANCE = 100.0f;
@@ -35,7 +36,7 @@ float LOD3_DISTANCE = 1000.0f;
 
 // --------------------------------------- BETTER DO NOT TOUCH ---------------------------------------
 float PLANET_SIZE = 10.0f;
-float STAR_SIZE = 50.0f;
+float STAR_SIZE = 100.0f;
 
 int HEIGTH = 1080;
 int WIDTH = 1920;
@@ -79,7 +80,8 @@ String SKYBOX_TEXTURE_PATH = "assets/background/skybox.png";
 String SKYBOX_MODEL_PATH = "assets/background/skybox.obj";
 
 String STAR_TEXTURE_PATH = "assets/starSystem/starWhite.jpg";
-String PLANET_TEXTURE_PATH = "assets/starSystem/earth.jpg";
+String PLANET_TEXTURE_PATH = "assets/starSystem/starWhite.jpg";
+//String PLANET_TEXTURE_PATH = "assets/starSystem/earth.jpg";
 String PLANET_MODEL_PATH = "assets/starSystem/sphere.obj";
 
 //String PLAYER_TEXTURE_PATH = "assets/starship/FighterFemboy.png";
@@ -129,7 +131,7 @@ class Main{
     
     planets = new ArrayList<Planet>();
     for(int i = 0; i < NUMBER_OF_PLANETS; i++){
-      int enemyNumber = (int)(MULTIPLIER_ENEMIES * (i + 1) * 5);
+      int enemyNumber = (int)(MULTIPLIER_ENEMIES * (i + 1) * 1);
       println("Enemy number: " + enemyNumber);
       
       // The last planet always contain boss

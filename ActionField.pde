@@ -25,6 +25,7 @@ class ActionField{
   private PShape skyBoxModel;
   private PImage skyBoxTexture;
   private float skyBoxSize = 17000f;
+  private float skyBoxRotation;
   
   private PImage crosshair = loadImage(CROSSHAIR_IMG_PATH);
   private PImage victoryScreen = loadImage(VICTORY_SCREEN);
@@ -67,7 +68,6 @@ class ActionField{
     popMatrix();
   }
 
-  
   private void displayAxis(float x, float y, float z){
     pushMatrix();
 
@@ -90,9 +90,13 @@ class ActionField{
 
   private void displayAll(){
     pushMatrix();
+    noLights();
+    rotateY(skyBoxRotation);
     translate(-skyBoxSize / 2, -skyBoxSize / 2, -skyBoxSize / 2);
     shape(skyBoxModel);
     popMatrix();
+    lights();
+
 
     float tx = cam.getX();
     float ty = cam.getY();
@@ -102,7 +106,9 @@ class ActionField{
     mainStarship.setPosX(cam.getX() - camInitX);
     mainStarship.setPosY(cam.getY() - camInitY);
     mainStarship.setPosZ(cam.getZ() - camInitZ);
+    pointLight(255,255,127, cam.getX() - camInitX, cam.getY() - camInitY+1, cam.getZ() - camInitZ-40);
     mainStarship.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1, 0.015 * (tx - cam.getX()));
+
 
     //displayAxis(cam.getX() - camInitX, cam.getY() - camInitY, cam.getZ() - camInitZ);
 
@@ -136,13 +142,15 @@ class ActionField{
   public Signal calculateActions(int level){    
     switch(state){
       case INIT:
+        skyBoxRotation = random(-PI, PI);
+        bullets.clear();
         currentLevel = level;
         enemies = new ArrayList<>();
         enemyNumber = planets.get(currentLevel).getEnemyNumber();
         for(int i = 0; i < enemyNumber; i++){
           enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -80 - i * 50, 80 + i * 50, 800));        
         }
-        
+                
         sd = new StarDrawer();
         
         for(Starship ss : enemies){
@@ -162,14 +170,13 @@ class ActionField{
         prepareTiming--;
         if(prepareTiming == 0) state = ActionFieldState.BATTLE;
           return Signal.CONTINUE;
-      case BATTLE: break;
-      case GAMEOVER: break;
-      case CLEARED: break;
-      case VICTORY: break;
+      default:
+        break;
       }
     
     
     ////Enemy collision check
+    
     Iterator<Starship> enemyIterator = enemies.iterator();
     while(enemyIterator.hasNext()){
       if(!bullets.isEmpty()){
@@ -193,6 +200,7 @@ class ActionField{
         break;
       }
     }
+    
     //  //enemy.move();                                      // HERE I NEED TO MOVE ENEMY'S STARSHIP
     //}
     
@@ -216,7 +224,6 @@ class ActionField{
       bullet.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1);
     }
     
-    noLights();
 
     for(Starship ss: enemies){
       if(random(0, enemyNumber) > enemies.size()){
@@ -238,7 +245,7 @@ class ActionField{
       displayScreen(redScreen);
     }
 
-    if(enemies.isEmpty()){
+    if(enemies.isEmpty() && state != ActionFieldState.GAMEOVER){
       if(currentLevel == planets.size() - 1){
         state = ActionFieldState.VICTORY;
         displayScreen(victoryScreen);
