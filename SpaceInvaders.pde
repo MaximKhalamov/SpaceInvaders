@@ -2,7 +2,7 @@ import java.util.List;
 import java.util.Iterator;
 
 // --------------------------------------- CUSTOMIZABLE ---------------------------------------
-int NUMBER_OF_PLANETS =               8;     // Also number of levels
+int NUMBER_OF_PLANETS =               4;     // Also number of levels
 float MULTIPLIER_ENEMIES =            1.0f;  // Multiplier for the numbers of enemies
 float MULTIPLIER_FIRE_RATE_ENEMY =    1.0f;
 float MULTIPLIER_FIRE_RATE_PLAYER =   1.0f;
@@ -13,8 +13,8 @@ float FPS = 60.0f;
 int PLAYER_HEALTH = 50;
 int PLAYER_SHIELD = 0;
 
-int ENEMY_LIGHT_HEALTH = 10;
-int ENEMY_LIGHT_SHIELD = 0;
+int ENEMY_LIGHT_HEALTH = 20;
+int ENEMY_LIGHT_SHIELD = 10;
 
 int ENEMY_MEDIUM_HEALTH = 30;
 int ENEMY_MEDIUM_SHIELD = 10;
@@ -25,9 +25,8 @@ int ENEMY_HEAVY_SHIELD = 30;
 int ENEMY_BOSS_HEALTH = 100;
 int ENEMY_BOSS_SHIELD = 60;
 
-float HORIZONTAL_SPEED = 20.0f;
-//float HORIZONTAL_SPEED = 1.0f;
 boolean IS_CINEMATOGRAPHIC_CAMERA = true;
+int NUMBER_OF_WAVES = 5;
 
 float LOD1_DISTANCE = 100.0f;
 float LOD2_DISTANCE = 300.0f;
@@ -58,13 +57,15 @@ PShape ENEMY_STARSHIP_LOD1_MODEL;
 PShape ENEMY_STARSHIP_LOD2_MODEL;
 PShape ENEMY_STARSHIP_LOD3_MODEL;
 
+PShape HEALTH_DAMAGE_MODEL;
+PShape SHIELD_DAMAGE_MODEL;
+
 color PLAYER_BULLET_COLOR = color(0, 255, 0);
 color ENEMY_BULLET_COLOR = color(255, 0, 0);
 
 enum State{
   BACKGROUND,
   ACTIONFIELD,
-  TRANSITION,
   MENU
 }
 
@@ -78,6 +79,9 @@ enum Signal{
 
 String SKYBOX_TEXTURE_PATH = "assets/background/skybox.png";
 String SKYBOX_MODEL_PATH = "assets/background/skybox.obj";
+
+String HEALTH_DAMAGE_TEXTURE_PATH = "assets/damageTexture.png";
+String SHIELD_DAMAGE_TEXTURE_PATH = "assets/shieldTexture.png";
 
 String STAR_TEXTURE_PATH = "assets/starSystem/starWhite.jpg";
 String PLANET_TEXTURE_PATH = "assets/starSystem/starWhite.jpg";
@@ -138,31 +142,35 @@ class Main{
       planets.add( new Planet(enemyNumber, i - 1 == NUMBER_OF_PLANETS, PLANET_SIZE ) );
     }
     currentLevel = 0;
-  
+
     actionField = new ActionField(planets);
     background = new Background(planets);
   }
-  
+
   public void loadModels(){
     ENEMY_STARSHIP_LOD0_MODEL = modelBuilder(ENEMY_MODEL_LOD0_PATH, ENEMY_TEXTURE_LOD0_PATH, ENEMY_MODEL_SCALE);
     ENEMY_STARSHIP_LOD1_MODEL = modelBuilder(ENEMY_MODEL_LOD1_PATH, ENEMY_TEXTURE_LOD1_PATH, ENEMY_MODEL_SCALE);
     ENEMY_STARSHIP_LOD2_MODEL = modelBuilder(ENEMY_MODEL_LOD2_PATH, ENEMY_TEXTURE_LOD2_PATH, ENEMY_MODEL_SCALE);
     ENEMY_STARSHIP_LOD3_MODEL = modelBuilder(ENEMY_MODEL_LOD3_PATH, ENEMY_TEXTURE_LOD3_PATH, ENEMY_MODEL_SCALE);
-    
+    ENEMY_STARSHIP_LOD3_MODEL = modelBuilder(ENEMY_MODEL_LOD3_PATH, ENEMY_TEXTURE_LOD3_PATH, ENEMY_MODEL_SCALE);
+
+    HEALTH_DAMAGE_MODEL = modelBuilder(ENEMY_MODEL_LOD3_PATH, HEALTH_DAMAGE_TEXTURE_PATH, ENEMY_MODEL_SCALE * 1.3);
+    SHIELD_DAMAGE_MODEL = modelBuilder(ENEMY_MODEL_LOD3_PATH, SHIELD_DAMAGE_TEXTURE_PATH, ENEMY_MODEL_SCALE * 1.3);
+
     PLAYER_STARSHIP_MODEL = modelBuilder(PLAYER_MODEL_PATH, PLAYER_TEXTURE_PATH, PLAYER_MODEL_SCALE); 
   }
-  
+
   private PShape modelBuilder(String modelPath, String texturePath, float scaleCoeff){
     PShape model = loadShape(modelPath);
     model.scale(scaleCoeff);
     model.setTexture(loadImage(texturePath));
     return model;
   }
-  
+
   public Signal drawBackground(){
     return background.drawBG(currentLevel);
   }
-  
+
   public Signal drawActionField(){
     return this.actionField.calculateActions(currentLevel);
   }
@@ -223,8 +231,6 @@ void draw(){
       if(main.drawBackground() == Signal.SWITCH){
         main.changeState(State.ACTIONFIELD);
       }    
-      break;
-    case TRANSITION:
       break;
     case MENU:
       break;

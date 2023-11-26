@@ -1,6 +1,7 @@
 enum ActionFieldState{
   INIT,
   PREPARING,
+  PREBATTLE_INFO,
   BATTLE,
   GAMEOVER,
   CLEARED,
@@ -9,7 +10,7 @@ enum ActionFieldState{
 
 class ActionField{
   private MainStarship mainStarship;
-  private List<Starship> enemies;
+  private List<List<Starship>> enemies;
   private List<Bullet> bullets;
   private List<Planet> planets;
 
@@ -21,6 +22,7 @@ class ActionField{
 
   private int currentLevel;
   private int enemyNumber;
+  private List<Starship> waveList;
 
   private PShape skyBoxModel;
   private PImage skyBoxTexture;
@@ -138,6 +140,13 @@ class ActionField{
     camera(cam.getX(), cam.getY(), cam.getZ(), cam.getX(), cam.getY(), cam.getZ() + 0.1, 0, 1, 0);
   }
 
+  private void displayAllEnemies(){
+    for(List<Starship> ssList : enemies){
+      for(Starship ss : ssList){
+        ss.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1); 
+      }
+    }
+  }
 
   public Signal calculateActions(int level){    
     switch(state){
@@ -146,30 +155,48 @@ class ActionField{
         bullets.clear();
         currentLevel = level;
         enemies = new ArrayList<>();
-        enemyNumber = planets.get(currentLevel).getEnemyNumber();
-        for(int i = 0; i < enemyNumber; i++){
-          enemies.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -80 - i * 50, 80 + i * 50, 800));        
-        }
-                
-        sd = new StarDrawer();
+        for(int j = 0; j < NUMBER_OF_WAVES; j++){
+          List<Starship> waveListGen = new ArrayList<>();
         
-        for(Starship ss : enemies){
-          ss.setVelZ(-1.5);
+          enemyNumber = planets.get(currentLevel).getEnemyNumber();
+          for(int i = 0; i < enemyNumber; i++){
+            waveListGen.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -80 - i * 50, 80 + i * 50, 800 * (1 + j)));        
+            waveListGen.get(i).setVelZ(-1.5);
+          }
+          
+          enemies.add(waveListGen);
         }
+        
+        sd = new StarDrawer();
         
         state = ActionFieldState.PREPARING;
         prepareTiming = (int)(80 * MULTIPLIER_SCREEN_TRANSISTION);
         clearedTiming = (int)(80 * MULTIPLIER_SCREEN_TRANSISTION);
         break;
       case PREPARING: 
-        for(Starship ss : enemies){
-          ss.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1);      
-        }
+        displayAllEnemies();
         displayAll();
         displayScreen(prepareScreen);
         prepareTiming--;
         if(prepareTiming == 0) state = ActionFieldState.BATTLE;
           return Signal.CONTINUE;
+      case CLEARED:
+        displayAll();
+        displayScreen(clearedScreen);
+        clearedTiming--;
+        if(clearedTiming == 0){
+          state = ActionFieldState.INIT;
+          return Signal.SWITCH;
+        }
+        return Signal.CONTINUE;
+      case VICTORY:
+        displayAll();
+        displayScreen(victoryScreen);
+        return Signal.CONTINUE;
+      case GAMEOVER:
+        displayScreen(gameoverScreen);
+        return Signal.CONTINUE;
+
       default:
         break;
       }
@@ -177,10 +204,10 @@ class ActionField{
     
     ////Enemy collision check
     
-    Iterator<Starship> enemyIterator = enemies.iterator();
+    waveList = enemies.get(0);
+    Iterator<Starship> enemyIterator = waveList.iterator();
     while(enemyIterator.hasNext()){
       if(!bullets.isEmpty()){
-        //println("Check");
         Starship enemy = enemyIterator.next();
         Iterator<Bullet> bulletIterator = bullets.iterator();
           while(bulletIterator.hasNext()){
@@ -214,6 +241,7 @@ class ActionField{
           bulletIterator.remove();
           if(mainStarship.setDamage( bullet.getDamage() )){
             state = ActionFieldState.GAMEOVER;
+            return Signal.CONTINUE;      
           }    
         }
       }
@@ -224,19 +252,30 @@ class ActionField{
       bullet.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1);
     }
     
-
-    for(Starship ss: enemies){
-      if(random(0, enemyNumber) > enemies.size()){
+    for(List<Starship> wl : enemies){
+      for(Starship ss : wl){
         ss.frameMove();      
       }
-      if(ss.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1)){
+    }
+    
+    displayAllEnemies();
+    
+    for(Starship ss: waveList){
         if(random(0, 100) < 1 * MULTIPLIER_FIRE_RATE_ENEMY){
           bullets.add(ss.shot());
         }
-      }            
     }
     
-    if(!enemies.isEmpty() && enemies.get(0).getPosZ() < 0) state = ActionFieldState.GAMEOVER;
+    if(waveList.isEmpty()){
+      enemies.remove(0);
+      if(!enemies.isEmpty()) waveList = enemies.get(0);
+    }
+    
+    if(!enemies.isEmpty())
+      if(waveList.get(0).getPosZ() < 0){
+        state = ActionFieldState.GAMEOVER;
+        return Signal.CONTINUE;      
+      }
       
     displayAll();
 
@@ -244,28 +283,13 @@ class ActionField{
       redScreenTiming--;
       displayScreen(redScreen);
     }
-
-    if(enemies.isEmpty() && state != ActionFieldState.GAMEOVER){
+    if(enemies.isEmpty()){
       if(currentLevel == planets.size() - 1){
         state = ActionFieldState.VICTORY;
-        displayScreen(victoryScreen);
-    } else {
+      } else {
         state = ActionFieldState.CLEARED;
-        displayScreen(clearedScreen);
-        clearedTiming--;
-        if(clearedTiming == 0){
-          state = ActionFieldState.INIT;
-          return Signal.SWITCH;
-        }
       }
-      return Signal.CONTINUE;
-    }
-
-    if(state == ActionFieldState.GAMEOVER){
-      displayScreen(gameoverScreen);
-      return Signal.CONTINUE;
-    }
-    
-    return Signal.CONTINUE;
+    }    
+    return Signal.CONTINUE;    
   }
 }

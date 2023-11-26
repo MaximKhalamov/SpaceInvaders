@@ -21,6 +21,8 @@ abstract class Starship extends GameObject{
       } else{
         health -= damage;
       }
+    } else{
+      shield -= damage;
     }
     return false;
   }
@@ -31,6 +33,14 @@ abstract class Starship extends GameObject{
   
   public int getHealth(){
     return health;
+  }
+  
+  public void setShield(int s){
+    shield = s;
+  }
+  
+  public void setHealth(int h){
+    health = h;
   }
 
   public void setModel(PShape modelLOD0, PShape modelLOD1, PShape modelLOD2, PShape modelLOD3){
