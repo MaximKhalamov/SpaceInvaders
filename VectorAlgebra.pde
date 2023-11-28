@@ -11,5 +11,5 @@ boolean isObjectOnScreen(float posX, float posY, float posZ, float camX, float c
   return cos( getDotMult( posX - camX, posY - camY, posZ - camZ, camDirX, camDirY, camDirZ) / 
                     //( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * (WIDTH / HEIGTH)  ) ) ){
                     //( getNorm(getPosX() - camX, getPosY() - camY, getPosZ() - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 3 * ( (float)WIDTH / HEIGTH)  )  ) ){
-                    ( getNorm(posX - camX, posY - camY, posZ - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * ((float)WIDTH / HEIGTH)  )  );
+                    ( getNorm(posX - camX, posY - camY, posZ - camZ) * getNorm(camDirX, camDirY, camDirZ) ) ) > cos( FOV / ( 2 * ((float)WIDTH / HEIGHT)  )  );
 }

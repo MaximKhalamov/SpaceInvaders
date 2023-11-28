@@ -24,7 +24,8 @@ class Planet{
   
     
     model = loadShape(PLANET_MODEL_PATH);
-    texture = loadImage(PLANET_TEXTURE_PATH);
+        
+    texture = loadImage(getRandomTexture());
     if(model == null){
       println("Model not found");
     }
@@ -36,7 +37,30 @@ class Planet{
     //TODO: load random planet UV-texture with random color
     
     model.scale(planetSize);
-}
+  }
+  
+  private String getRandomTexture(){
+    File directory = new File(RELATIVE_PATH + PLANET_TEXTURE_PATHS);
+    //File directory = new File(PLANET_TEXTURE_PATHS);
+    
+    if (!directory.isDirectory()) {
+      System.out.println(directory.getAbsolutePath());
+      System.err.println("Specified path is not a directory.");
+      return null;
+    }
+
+    File[] files = directory.listFiles();
+
+    if (files == null || files.length == 0) {
+        System.err.println("No files found in the directory.");
+        return null;
+    }
+
+    Random random = new Random();
+    int randomIndex = random.nextInt(files.length);
+
+    return files[randomIndex].getAbsolutePath();
+  }
   
   public float getX(){
     return x;
@@ -50,6 +74,7 @@ class Planet{
     pushMatrix();
     translate(x, y);
     rotateX(PI/2);
+    //sphere(planetSize);
     shape(model);
     popMatrix();
   }

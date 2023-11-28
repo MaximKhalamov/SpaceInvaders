@@ -13,20 +13,25 @@ class Background{
   
   private float middlePointBezierX;
   private float middlePointBezierY;
+    
+  private float vec1x;
+  private float vec1y;
+        
+  private float xCamCin;
+  private float yCamCin;
   
+    
   public Background(List<Planet> planets){
     this.planets = planets;
     
     skyBoxModel = loadShape(SKYBOX_MODEL_PATH);
     skyBoxTexture = loadImage(SKYBOX_TEXTURE_PATH);
     skyBoxModel.setTexture(skyBoxTexture);
-    skyBoxModel.setAmbient(0xfffffff);
     skyBoxModel.scale(skyBoxSize);
     
     starModel = loadShape(PLANET_MODEL_PATH);
     starTexture = loadImage(STAR_TEXTURE_PATH);
-    starModel.setAmbient(0xff7f7f00);
-    //starModel.setFill(color(255, 255, 63, 255));
+    starModel.setEmissive(color(255, 190, 0));
     starModel.setTexture(starTexture);
     starModel.scale(STAR_SIZE);
     
@@ -38,7 +43,8 @@ class Background{
   private float hermit(float x) { return 3 * x * x - 2 * x * x * x; }
   
   private float getQuarter(float p1, float p2){
-    return (p2 - p1) / 3;
+    //return (p2 - p1) / 3;
+    return (p2 - p1) / 6;
   }
   
   private void setBezierPoints(Planet planetFrom, Planet planetTo){
@@ -76,18 +82,17 @@ class Background{
   }
   
   private void move(Planet planetFrom, Planet planetTo){
-    paramT += 0.005;
     if(IS_CINEMATOGRAPHIC_CAMERA){
-      float startPosX = planetFrom.getX() + getQuarter(planetFrom.getX(), planetTo.getX());
-      float startPosY = planetFrom.getY() + getQuarter(planetFrom.getY(), planetTo.getY());
+      if(paramT == 0.0f){
+        float startPosX = planetFrom.getX() + getQuarter(planetFrom.getX(), planetTo.getX());
+        float startPosY = planetFrom.getY() + getQuarter(planetFrom.getY(), planetTo.getY());
 
-      float vec1x = planetFrom.getX() - planetTo.getX();
-      float vec1y = planetFrom.getY() - planetTo.getY();
+        vec1x = planetFrom.getX() - planetTo.getX();
+        vec1y = planetFrom.getY() - planetTo.getY();
       
-      float xCam = startPosX - Math.signum(planetFrom.getX() * vec1y - planetFrom.getY() * vec1x) * getQuarter(planetFrom.getY(), planetTo.getY());
-      float yCam = startPosY + Math.signum(planetFrom.getX() * vec1y - planetFrom.getY() * vec1x) * getQuarter(planetFrom.getX(), planetTo.getX());
-      //float xCam = startPosX - INIT_RADIUS / 2;
-      //float yCam = startPosY + INIT_RADIUS / 2;
+        xCamCin = startPosX - Math.signum(planetFrom.getX() * vec1y - planetFrom.getY() * vec1x) * getQuarter(planetFrom.getY(), planetTo.getY());
+        yCamCin = startPosY + Math.signum(planetFrom.getX() * vec1y - planetFrom.getY() * vec1x) * getQuarter(planetFrom.getX(), planetTo.getX());
+      }
       
       pushMatrix();
       translate(map(paramT, 0f, 1f, planetFrom.getX(), planetTo.getX()), map(paramT, 0f, 1f, planetFrom.getY(), planetTo.getY()), 16);
@@ -97,7 +102,7 @@ class Background{
       shape(PLAYER_STARSHIP_MODEL);
       popMatrix();
             
-      camera(xCam, yCam, 8,
+      camera(xCamCin, yCamCin, 8,
             map(paramT, 0f, 1f, planetFrom.getX(), planetTo.getX()), map(paramT, 0f, 1f, planetFrom.getY(), planetTo.getY()), 16,
             0, 0, -1);
 
@@ -123,7 +128,8 @@ class Background{
               xCam + xCamDeriv, yCam + yCamDeriv, PLANET_SIZE + 1,
                0, 0, -1);
     }
-  }
+    paramT += 0.005;
+}
   
   public Signal drawBG(int planetMoveTo){
     noLights();
@@ -135,9 +141,15 @@ class Background{
 
     lights();
     pointLight(255,255,255,0,0,0);
+    
     pushMatrix();
     rotateX(-PI/2);
+    noStroke();
+    fill(255,255,255, 255);
+    //sphere(100);
+    hint(DISABLE_DEPTH_TEST);
     shape(starModel);
+    hint(ENABLE_DEPTH_TEST);
     popMatrix();
 
     for(Planet planet: planets){

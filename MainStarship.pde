@@ -5,7 +5,7 @@ float PLAYER_BULLET_SPEED_X = 0;
 float PLAYER_BULLET_SPEED_Y = 0;
 float PLAYER_BULLET_SPEED_Z = 50.0f;
 float PLAYER_BULLET_RADIUS = 5.0f;
-int PLAYER_BULLET_LIFE_TIME = 300;
+int PLAYER_BULLET_LIFE_TIME = 100;
 int PLAYER_DAMAGE = 10;
 
 class MainStarship extends Starship{
@@ -42,6 +42,7 @@ class MainStarship extends Starship{
     } else if ( distance >= LOD2_DISTANCE && distance < LOD3_DISTANCE ){
       shape(modelLOD2);
     } else {
+      fill(38, 26, 26);
       shape(modelLOD3);
     }
     popMatrix();

@@ -13,12 +13,17 @@ class ActionField{
   private List<List<Starship>> enemies;
   private List<Bullet> bullets;
   private List<Planet> planets;
+  private List<ExplosionEffect> effects;
+  private Control control;
+  private ControlKeyboard controlKeyboard;
+  private WaveGenerator waveGenerator;
 
   private int bulletTiming = 50;
   private int prepareTiming;
   private int clearedTiming;
 
   private ActionFieldState state = ActionFieldState.INIT;
+  private PreparingInfo preparingInfo;
 
   private int currentLevel;
   private int enemyNumber;
@@ -54,14 +59,22 @@ class ActionField{
     skyBoxTexture = loadImage(SKYBOX_TEXTURE_PATH);
     skyBoxModel.setTexture(skyBoxTexture);
     skyBoxModel.scale(skyBoxSize);
+    
+    waveGenerator = new WaveGenerator(-WIDTH, HEIGHT);
 
     mainStarship = new MainStarship(PLAYER_HEALTH, PLAYER_SHIELD);
+    
+    if(DEVICE == Device.GAMEPAD){
+      control = new Control();  
+    } else if(DEVICE == Device.KEYBOARD){
+      controlKeyboard = new ControlKeyboard();    
+    }
   }
 
   private void displayScreen(PImage texture){
     pushMatrix();
     float scaleCoeff = 0.002;
-    translate(cam.getX() + WIDTH / 2 * scaleCoeff, cam.getY() - HEIGTH / 2 * scaleCoeff, cam.getZ()+1);
+    translate(cam.getX() + WIDTH / 2 * scaleCoeff, cam.getY() - HEIGHT / 2 * scaleCoeff, cam.getZ()+1);
     rotateY(PI);
     scale(scaleCoeff);
     hint(DISABLE_DEPTH_TEST);
@@ -103,24 +116,64 @@ class ActionField{
     float tx = cam.getX();
     float ty = cam.getY();
 
-    cam.setX(lerp(cam.getX(), -coeffX*mouseX, easing));
-    cam.setY(lerp(cam.getY(), coeffY*mouseY, easing));
+    Iterator<ExplosionEffect> iterEffect = effects.iterator();
+    while(iterEffect.hasNext()){
+      ExplosionEffect effect = iterEffect.next(); 
+      if(!effect.display()){
+        iterEffect.remove();
+      }
+    }
+
+    switch(DEVICE){
+      case MOUSE:
+        cam.setX(lerp(cam.getX(), -coeffX*mouseX, easing));
+        cam.setY(lerp(cam.getY(), coeffY*mouseY, easing));
+    
+        bulletTiming--;
+        if(mousePressed && (mouseButton == LEFT) && state == ActionFieldState.BATTLE){
+          if( bulletTiming < 0 ){
+              bullets.add(mainStarship.shot());
+              audioController.playOnceShot();
+            bulletTiming = (int)(10 / MULTIPLIER_FIRE_RATE_PLAYER);    
+          }
+        }
+        break;
+      case GAMEPAD:
+        cam.setX(lerp(cam.getX(), -coeffX*control.getX(), easing));
+        cam.setY(lerp(cam.getY(), coeffY*control.getY(), easing));
+    
+        bulletTiming--;
+        if(control.isPressed() && state == ActionFieldState.BATTLE){
+          if( bulletTiming < 0 ){
+              bullets.add(mainStarship.shot());
+              audioController.playOnceShot();
+            bulletTiming = (int)(10 / MULTIPLIER_FIRE_RATE_PLAYER);    
+          }
+        }
+        break;
+        
+      case KEYBOARD:
+        cam.setX(lerp(cam.getX(), -coeffX*controlKeyboard.getX(), easing));
+        cam.setY(lerp(cam.getY(), coeffY*controlKeyboard.getY(), easing));
+    
+        bulletTiming--;
+        if(controlKeyboard.isPressed() && state == ActionFieldState.BATTLE){
+          if( bulletTiming < 0 ){
+              bullets.add(mainStarship.shot());
+              audioController.playOnceShot();
+            bulletTiming = (int)(10 / MULTIPLIER_FIRE_RATE_PLAYER);    
+          }
+        }
+        break;
+      }
+    
     mainStarship.setPosX(cam.getX() - camInitX);
     mainStarship.setPosY(cam.getY() - camInitY);
     mainStarship.setPosZ(cam.getZ() - camInitZ);
-    pointLight(255,255,127, cam.getX() - camInitX, cam.getY() - camInitY+1, cam.getZ() - camInitZ-40);
+    pointLight(255,255,127, cam.getX() - camInitX + random(-5, 5), cam.getY() - camInitY + 1 + random(-5, 5), cam.getZ() - camInitZ - 40 + random(-5, 5));
     mainStarship.display(cam.getX(), cam.getY(), cam.getZ(), 0, 0, 1, 0.015 * (tx - cam.getX()));
 
-
     //displayAxis(cam.getX() - camInitX, cam.getY() - camInitY, cam.getZ() - camInitZ);
-
-    bulletTiming--;
-    if(mousePressed && (mouseButton == LEFT) && state != ActionFieldState.GAMEOVER){
-      if( bulletTiming < 0 ){
-          bullets.add(mainStarship.shot());
-        bulletTiming = (int)(10 / MULTIPLIER_FIRE_RATE_PLAYER);    
-      }
-    }
 
     pushMatrix();
     //translate(cam.getX(), cam.getY(), -cam.getZ());
@@ -151,6 +204,9 @@ class ActionField{
   public Signal calculateActions(int level){    
     switch(state){
       case INIT:
+        mainStarship.setShield(PLAYER_SHIELD);
+        preparingInfo = new PreparingInfo();
+        effects = new ArrayList<>();
         skyBoxRotation = random(-PI, PI);
         bullets.clear();
         currentLevel = level;
@@ -160,10 +216,19 @@ class ActionField{
         
           enemyNumber = planets.get(currentLevel).getEnemyNumber();
           for(int i = 0; i < enemyNumber; i++){
-            waveListGen.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -80 - i * 50, 80 + i * 50, 800 * (1 + j)));        
-            waveListGen.get(i).setVelZ(-1.5);
+            for(int k = 0; k < enemyNumber; k++){
+              //waveListGen.add(new EnemyStarship(ENEMY_LIGHT_HEALTH, ENEMY_LIGHT_SHIELD, -80 - i * 130, 80 + k * 130, 1400 * (1 + j)));        
+            }            
           }
           
+          waveListGen = waveGenerator.Generator(enemyNumber);
+          
+          for(int i = 0; i < waveListGen.size(); i++){
+              waveListGen.get(i).setVelZ(-0.5f * MULTIPLIER_SPEED_ENEMY);
+              waveListGen.get(i).setPosZ(800 * (j + 1));
+          }
+                        
+
           enemies.add(waveListGen);
         }
         
@@ -177,6 +242,11 @@ class ActionField{
         displayAllEnemies();
         displayAll();
         displayScreen(prepareScreen);
+        
+        pushMatrix();
+        preparingInfo.display(cam.getX() + WIDTH / 2, cam.getY() - HEIGHT / 2, cam.getZ()+10);
+        popMatrix();
+        
         prepareTiming--;
         if(prepareTiming == 0) state = ActionFieldState.BATTLE;
           return Signal.CONTINUE;
@@ -192,11 +262,12 @@ class ActionField{
       case VICTORY:
         displayAll();
         displayScreen(victoryScreen);
+        audioController.stopLoopSounds(false);
         return Signal.CONTINUE;
       case GAMEOVER:
         displayScreen(gameoverScreen);
+        audioController.stopLoopSounds(true);
         return Signal.CONTINUE;
-
       default:
         break;
       }
@@ -219,6 +290,7 @@ class ActionField{
               bulletIterator.remove();
               if(enemy.setDamage( bullet.getDamage() )){
                 enemyIterator.remove();
+                effects.add( new ExplosionEffect( enemy.getPosX(), enemy.getPosY(), enemy.getPosZ() ) );
               }; 
               break;      
             }
@@ -237,10 +309,12 @@ class ActionField{
       while(bulletIterator.hasNext()){
         Bullet bullet = bulletIterator.next();
         if(bullet.checkCollision(mainStarship)){
+          audioController.playOnceDamage();
           redScreenTiming = 4;
           bulletIterator.remove();
           if(mainStarship.setDamage( bullet.getDamage() )){
             state = ActionFieldState.GAMEOVER;
+            audioController.playOnceExplosion();
             return Signal.CONTINUE;      
           }    
         }
@@ -273,6 +347,7 @@ class ActionField{
     
     if(!enemies.isEmpty())
       if(waveList.get(0).getPosZ() < 0){
+        audioController.playOnceExplosion();
         state = ActionFieldState.GAMEOVER;
         return Signal.CONTINUE;      
       }

@@ -61,6 +61,7 @@ class EnemyStarship extends Starship{
   @Override
   public boolean display(float camX, float camY, float camZ, float camDirX, float camDirY, float camDirZ){
     if(!super.display(camX, camY, camZ, camDirX, camDirY, camDirZ) ) return false;
+    fill(38, 26, 26);
     pushMatrix();
     translate(getPosX(), getPosY(), getPosZ());
     rotateZ(PI);
