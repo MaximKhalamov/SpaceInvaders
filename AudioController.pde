@@ -45,11 +45,12 @@ class AudioController{
       music.loop();
       startSound.play();
       started = true;
-    } else if(!isLooped && !startSound.isPlaying()){
+    } else if(!startSound.isPlaying() && !isLooped){
+      println("AAAAAAAAAAA");
       isLooped = true;
       loopSound.loop();
     }
-  }
+}
   
   public void stopLoopSounds(boolean isStopMusic){
     loopSound.close();

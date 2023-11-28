@@ -272,7 +272,8 @@ class ActionField{
         break;
       }
     
-    
+      audioController.playLoopSounds();
+
     ////Enemy collision check
     
     waveList = enemies.get(0);

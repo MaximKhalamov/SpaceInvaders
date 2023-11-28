@@ -40,8 +40,8 @@ float LOD3_DISTANCE = 5000.0f;
 color PLAYER_BULLET_COLOR = color(0, 255, 0);
 color ENEMY_BULLET_COLOR = color(255, 0, 0);
 
-String RELATIVE_PATH = "/home/max/sketchbook/SpaceInvaders/";
 String DEVICE_NAME = "Xbox Wireless Controller";
+String RELATIVE_PATH = "/home/max/sketchbook/SpaceInvaders/";
 
 Device DEVICE = Device.MOUSE;
 
@@ -317,8 +317,9 @@ void readConfig() {
     Integer.parseInt(prop.getProperty("ENEMY_BULLET_COLOR_R")),
     Integer.parseInt(prop.getProperty("ENEMY_BULLET_COLOR_G")),
     Integer.parseInt(prop.getProperty("ENEMY_BULLET_COLOR_B")));
-
+    
   RELATIVE_PATH = prop.getProperty("RELATIVE_PATH");
+
   DEVICE_NAME = prop.getProperty("DEVICE_NAME");
   String devName = prop.getProperty("USING_DEVICE");
   if(devName.equals("MOUSE"))
