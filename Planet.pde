@@ -40,8 +40,8 @@ class Planet{
   }
   
   private String getRandomTexture(){
-    File directory = new File(RELATIVE_PATH + PLANET_TEXTURE_PATHS);
-    //File directory = new File(PLANET_TEXTURE_PATHS);
+    //File directory = new File(RELATIVE_PATH + PLANET_TEXTURE_PATHS);
+    File directory = new File(PLANET_TEXTURE_PATHS);
     
     if (!directory.isDirectory()) {
       System.out.println(directory.getAbsolutePath());

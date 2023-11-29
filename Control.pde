@@ -9,11 +9,16 @@ class Control{
   float globalPositionY = 0.0f;
   
   public Control(){
-    device = control.getDevice(DEVICE_NAME);
+    try{
+      device = control.getDevice(DEVICE_NAME);
+      sliderLeftX = device.getSlider("x");
+      sliderLeftY = device.getSlider("y");
+      buttonX = device.getButton("X");
+    } catch(RuntimeException re){
+      DEVICE = Device.MOUSE;
+    }
     
-    sliderLeftX = device.getSlider("x");
-    sliderLeftY = device.getSlider("y");
-    buttonX = device.getButton("X");
+
   }
   
   public float getX(){

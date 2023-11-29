@@ -107,7 +107,7 @@ class ActionField{
     pushMatrix();
     noLights();
     rotateY(skyBoxRotation);
-    translate(-skyBoxSize / 2, -skyBoxSize / 2, -skyBoxSize / 2);
+    //translate(-skyBoxSize / 2, -skyBoxSize / 2, -skyBoxSize / 2);
     shape(skyBoxModel);
     popMatrix();
     lights();

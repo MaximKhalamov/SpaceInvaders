@@ -4,7 +4,7 @@ class Background{
   
   private PShape skyBoxModel;
   private PImage skyBoxTexture;
-  private float skyBoxSize = 160000f;
+  private float skyBoxSize = 80000f;
 
   private PShape starModel;
   private PImage starTexture;
@@ -135,7 +135,7 @@ class Background{
     noLights();
     //lightSpecular(255, 255, 255);
     pushMatrix();
-    translate(-skyBoxSize / 2, -skyBoxSize / 2, -skyBoxSize / 2);
+    //translate(-skyBoxSize / 2, -skyBoxSize / 2, -skyBoxSize / 2);
     shape(skyBoxModel);
     popMatrix();
 

@@ -225,7 +225,7 @@ void setup(){
   main = new Main(minim);
   //main.changeState(State.BACKGROUND);
   noCursor();
-  perspective(FOV, float(width)/float(height), 1, 200000);
+  perspective(FOV, float(width)/float(height), 1, 400000);
   audioController.playLoopSounds();
   Thread gameThread = new Thread(new Runnable(){
     @Override
